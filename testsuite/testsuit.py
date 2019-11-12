@@ -2,20 +2,17 @@ from math import *
 from argparse import ArgumentParser as AP
 from difflib import unified_diff as ud
 from pathlib import Path
-import pdb
-import subprocess as sp
+import pdb #Allow you to debug the code """
+import subprocess as sp # Allow you to run the binary """
 from termcolor import colored
+import yaml #Allow you to use ymal file """
+
 
 """ diff: Create two list
 the first one will be the reference and the other one ours
 then apply sys.stdout.writelines(ud(ref, ourresult, fromfile=ref, tofile=student))
 use yml file
 test per categories
-"""
-
-"""stdin = "ls"
-ref = sp.run(["bash", "--posix"], capture_output = True, text = True, input = stdin)
-mytest = sp.run([binary], capture_output = True, text = True, input = stdin)
 """
 
 def runs(args, stdin):
@@ -26,9 +23,9 @@ def diff(ref, mytest):
     mytest = mytest.splitlines(keepends=True)
     return ''.join(ud(ref, mytest, fromfile="ref", tofile="mytest"))
 
-def do_test(binary, stdin):
-    ref = runs(["bash", "--posix"], stdin)
-    mytest = runs([binary], stdin)
+def do_test(binary, testcase):
+    ref = runs(["bash", "--posix"], testcase["stdin"])
+    mytest = runs([binary], testcase["stdin"])
 
     assert ref.stdout == mytest.stdout, \
     f"stdout differs:\n{diff(ref.stdout, mytest.stdout)}"
@@ -46,11 +43,13 @@ if __name__ == '__main__':
     parser.add_argument('bin', metavar = 'BIN')
     args = parser.parse_args()
     binary = Path(args.bin).absolute()
-    for testcase in ["ls", "ls -la"]:
+    with open("test.yml", "r") as test_files:
+        content = yaml.safe_load(test_files)
+    for testcase in content:
         try:
             do_test(binary, testcase)
         except AssertionError as err:
-            print(f"[{colored('Not Passed', 'red')}]")
+            print(f"[{colored('Not Passed', 'red')}]", testcase)
             print(err)
         else:
-            print(f"[{colored('Passed', 'green')}]")
+            print(f"[{colored('Passed', 'green')}]", testcase)
