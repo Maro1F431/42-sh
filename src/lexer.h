@@ -44,6 +44,12 @@ enum token_type
     DONE
 };
 
+struct token_table
+{
+    char *input[];
+    enum token_type *token_type;
+};
+
 struct token
 {
     char *value;
