@@ -1,8 +1,9 @@
-# ifndef LEXER_H
+#ifndef LEXER_H
 # define LEXER_H
 
 #define NB_TOKENS 38
 
+#include <stddef.h>
 
 enum token_type
 {
@@ -47,156 +48,10 @@ enum token_type
     DONE
 };
 
-
-
-struct token_type_map[NB_TOKENS]
-{
-    {
-        .input "\0",
-        .type END_OF_FILE
-    },
-    {
-        .input "\n",
-        .type LINE_BREAK
-    },
-    {
-        .input ";",
-        .type SEMICOL
-    },
-    {
-        .input ";;",
-        .type DOUBLE_SEMICOL
-    },
-    {
-        .input "&",
-        .type AMPERSAND
-    },
-    {
-        .input "&&",
-        .type DOUBLE_AMPERSAND
-    },
-    {
-        .input "|",
-        .type PIPE
-    },
-    {
-        .input "||",
-        .type DOUBLE_PIPE
-    },
-    {
-        .input "!",
-        .type EXCLAMATION
-    },
-    {
-        .input "{",
-        .type OPEN_CURLY_BRACKET
-    },
-    {
-        .input "}",
-        .type CLOSE_CURLY_BRACKET
-    },
-    {
-        .input "(",
-        .type OPEN_PAR
-    },
-    {
-        .input ")",
-        .type CLOSE_PAR
-    },
-    {
-        .input "function",
-        .type FUNCTION
-    },
-    {
-        .input ">",
-        .type CHEV_SIMPLE_R
-    },
-    {
-        .input "<",
-        .type CHEV_SIMPLE_L
-    },
-    {
-        .input ">>",
-        .type CHEV_DOUBLE_R
-    },
-    {
-        .input "<<",
-        .type CHEV_DOUBLE_L
-    },
-    {
-        .input "<<-",
-        .type CHEV_DOUBLE_H
-    },
-    {
-        .input ">&",
-        .type CHEV_AMP_R
-    },
-    {
-        .input "<&",
-        .type CHEV_AMP_L
-    },
-    {
-        .input ">|",
-        .type CHEV_PIPE
-    },
-    {
-        .input "<>",
-        .type LEFT_RIGHT
-    },
-    {
-        .input "while",
-        .type WHILE
-    },
-    {
-        .input "until",
-        .type UNTIL
-    },
-    {
-        .input "case",
-        .type CASE
-    },
-    {
-        .input "esac",
-        .type ESAC
-    },
-    {
-        .input "in",
-        .type IN
-    },
-    {
-        .input "if",
-        .type IF
-    },
-    {
-        .input "fi",
-        .type FI
-    },
-    {
-        .input "then",
-        .type THEN
-    },
-    {
-        .input "else",
-        .type ELSE
-    },
-    {
-        .input "elif",
-        .type ELIF
-    },
-    {
-        .input "do",
-        .type DO
-    },
-    {
-        .input "done",
-        .type DONE
-    }
-};
-
 struct token_map
 {
     char *input;
-    enum token_type *type;
+    enum token_type type;
 };
 
 struct token
@@ -210,5 +65,10 @@ struct lex
 {
     struct token *head;
 };
+
+struct lex *lexer_alloc(const char *str);
+void lexer_free(struct lex *lexer);
+struct token *lexer_peek(struct lex *lexer);
+struct token *lexer_pop(struct lex *lexer);
 
 #endif /* LEXER_H */
