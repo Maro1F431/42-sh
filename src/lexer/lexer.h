@@ -1,7 +1,7 @@
 #ifndef LEXER_H
 # define LEXER_H
 
-#define NB_TOKENS 38
+#define NB_TOKENS 35
 
 #include <stddef.h>
 
