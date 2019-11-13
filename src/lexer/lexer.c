@@ -243,9 +243,9 @@ static struct token *match_type(const char *str,
 
     for (int i = 0; i < NB_TOKENS; i++)
     {
-        if (!strcmp(word, g_token_map_list[i]->input))
+        if (!strcmp(word, g_token_map_list[i].input))
         {
-            token->type = g_token_map_list[i]->type;
+            token->type = g_token_map_list[i].type;
             break;
         }
     }

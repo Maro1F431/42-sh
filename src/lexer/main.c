@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    char *str = ", : ; ( )";
+    char *str = "< ; ( ) >>";
 
     struct lex *l = lexer_alloc(str);
 

@@ -13,7 +13,7 @@ size_t skip_space(const char *str, size_t i)
 }
 
 //get length of current_word
-size_t get_len(const har *str, size_t i)
+size_t get_len(const char *str, size_t i)
 {
     size_t len = 0;
     while (!isspace(str[i]))
