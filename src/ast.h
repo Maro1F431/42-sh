@@ -1,10 +1,6 @@
 #ifndef AST_H
 #define AST_H
 
-struct token;
-struct lex;
-struct token_table;
-
 // for building the ast we have to use the lex struct;
 
 /*
@@ -12,13 +8,46 @@ struct token_table;
  * Thus as a left
  */
 
+enum ast_type
+{
+    COMMAND = 0,
+    AND,
+    OR,
+    PIPE
+}
+
 struct ast
 {
-    struct ast *left;
-    struct ast *right;
-    struct token token;
+    enum ast_type type;
+    union {
+        struct {
+            struct ast *left;
+            struct ast *right;
+        } children;
+        struct command;
+    } data;
 };
 
-struct ast *buildast(struct lex *lex);
+static inline struct ast *left_child(struct ast *ast)
+{
+    return ast->data.children.left;
+}
+
+static inline struct ast *right_child(struct ast *ast)
+{
+    return ast->data.children.right;
+}
+
+struct command
+{
+    struct redirection[] redirections;// TODO LATER (week 2)
+    char[][] argv; //first arg is the command.
+};
+
+struct ast *ast_alloc(void);
+
+void ast_free(struct ast *ast);
+
+struct ast *ast_alloc_command(struct command);
 
 #endif

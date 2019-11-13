@@ -3,38 +3,30 @@
 #include "ast.h"
 #include "lexer.h"
 
-struct stack_ast
+struct ast *ast_alloc(void)
 {
-    struct ast *ast;
-    struct stack_ast *next;
-};
-
-struct ast *pop(struct stack_ast *stack)
-{
-    if (stack == NULL)
-    {
-        return NULL;
-    }
-    else
-    {
-        struct ast *head = stack->ast;
-        stack = stack->next;
-        return tok;
-    }
+    struct ast *res = xmalloc(sizeof(*res));
+    memset(res, 0, sizeof(*res));
+    return res;
 }
 
-struct stack_ast *push(struct stack_ast *stack, struct ast *ast)
+void ast_free(struct ast *ast)
 {
-    struct ast_stack *new_stack = malloc(sizeof(struct ast));
-    new_stack->ast = ast;
-    new_stack->next = stack;
-    stack = new_stack;
-    return stack;
+    if (ast && ast->type != EXPR_NUMBER)
+    {
+        ast_free(right_child(ast));
+        ast_free(left_child(ast));
+    }
+
+    free(ast);
 }
 
-struct ast *buildast(struct lex *lex)
+struct ast *ast_alloc_command(void)
 {
-    struct ast *ast = malloc(sizeof(struct ast));
-    struct stack_ast *operator = malloc(sizeof(struct stack_ast));
-    struct stack_ast *operand = malloc(sizeof(struct stack_ast));
+    struct ast *res = ast_alloc();
+    res->type = COMMAND;
+    struct command *cmd = malloc(sizeof(struct command));
+    cmd->argv = malloc(sizeof(char *) * 100);
+    res->data.command = cmd;
+    return res;
 }
