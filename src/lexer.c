@@ -85,69 +85,34 @@ size_t nb_digits(int value)
 
 
 
+static struct token_table *init_token_table(void)
+{
 
+}
+
+
+// associate a token type to a word of the input string
+// str : input string
+// token : the current token which will receive the type of token
+// ptr_i : a pointer to the index where the word to identify starts
+//          (muste be incremented by the size of the identified word)
 static struct token *match_type(const char *str,
         struct token *token, size_t *ptr_i)
 {
-    size_t i = *ptr_i;
+    struct token_table *token_table = init_token_table();
 
-    if (str[i] == '(')
-        token->type = TOKEN_LEFT_PARENTHESIS;
-    else if (str[i] == ')')
-        token->type = TOKEN_RIGHT_PARENTHESIS;
-    else if (str[i] == '+')
-        token->type = TOKEN_PLUS;
-    else if (str[i] == '-')
-        token->type = TOKEN_MINUS;
-    else if (str[i] == '*')
-        token->type = TOKEN_MULTIPLY;
-    else if (str[i] == '/')
-        token->type = TOKEN_DIVIDE;
-    else if (str[i] >= '0' && str[i] <= '9')
+    char *word = get_word(str, ptr_i);
+
+    for (int i = 0; i < NB_TOKENS, i++)
     {
-        token->type = TOKEN_NUMBER;
-        token->value = atoi(str + i);
-        *ptr_i += nb_digits(token->value) - 1;
-    }
-    else
-        return NULL;
-
-    return token;
-}
-
-
-static struct lex *lex(const char *str, struct lex *l)
-{
-    size_t i = 0;
-    while (str[i] != '\0')
-    {
-        struct token *token = malloc(sizeof(struct token));
-        if (!token)
-            return NULL;
-
-        while (str[i] == ' ')
-            i++;
-
-        if (str[i] == '\0')
+        if (!strcmp(word, token_table->input[i]))
+        {
+            token->type = token_table->token_type[i];
             break;
-
-        token = match_type(str, token, &i);
-        if (!token)
-            return NULL;
-
-        l = add_token(l, token);
-        if (!l)
-            return NULL;
-
-        i++;
+        }
     }
-
-    l = add_eof(l);
-    if (!l)
-        return NULL;
-
-    return l;
 }
+
 
 
 /**
