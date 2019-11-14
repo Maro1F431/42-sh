@@ -4,7 +4,7 @@
 #include "parser.h"
 #include "../lexer/lexer.h"
 
-static struct ast_node *parse_simple_command(struct lex *lexer)
+struct ast_node *parse_simple_command(struct lex *lexer)
 {
     struct token *token = lexer_peek(lexer);
     if (!token)
@@ -32,7 +32,7 @@ static struct ast_node *parse_simple_command(struct lex *lexer)
     //return cmd_node;
 }
 
-static struct ast_node *parse_list(struct lex *lexer)
+struct ast_node *parse_list(struct lex *lexer)
 {
     struct ast_node *first_child_command;
     if (!(first_child_command = parse_simple_command(lexer)))
