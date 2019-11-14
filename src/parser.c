@@ -3,55 +3,47 @@
 #include "parser.h"
 #include "lexer.h"
 
-static bool token_is_ws(struct token *token)
+static struct *ast_node parse_command(struct lexer *lexer)
 {
-    return token->type == SEMICOL || token->type == WORD;
-}
-
-static bool parse_command(struct lexer *lexer, struct ast **ast)
-{
-    struct token *token = lexer_pop(lexer);
+    struct token *token = lexer_peek(lexer);
     if (!token)
-        return false;
+        return NULL;
 
-    bool res = true;
     if (token->type == WORD)
     {
-        *ast = ast_alloc_command();
-        size_t index = 0;
-        while ((struct token poped = lexer_pop(lexer))->type == WORD)
+        struct ast_node *cmd_node = ast_node_alloc();
+        cmd_node->type = COMMAND;
+        while (lexer_peek(lexer)->type == WORD)
         {
-            (*ast)->data->command->argv[index] = poped->value;
-            index++;
+            token = lexer_pop(lexer);
+            struct ast_node *word_child = ast_node_alloc();
+            word_child->type = WORD;
+            word_child->data = token->value;
+            insert_children(cmd_node, word_child);
         }
     }
     else
-        res = false;
+        return NULL;
 
     token_free(token);
-    return res;
+    return cmd_node;
 }
 
-static bool parse_list(struct lexer *lexer, struct ast **ast)
+static bool parse_list(struct lexer *lexer)
 {
-    if (!parse_command(lexer, ast))
-        return false;
+    if (!(struct ast_node *first_child_command 
+                = parse_command(lexer, ast_node)))
+        return NULL;
 
-    bool res = true;
-    struct token *token = lexer_peek(lexer);
-    while (res && token && token->type == SEMICOL)
+    list_node = ast_node_alloc();
+    list_node->type = LIST;
+    insert_children(list_node, first_child_command);
+    while (lexer_peek(lexer)->type == SEMICOL)
     {
-        token = lexer_pop(lexer);
-
-        struct ast *tmp = ast_alloc();
-        tmp->type = SEMICOL;
-
-        res = parse_command(lexer, &tmp->data.children.right);
-        tmp->data.children.left = *ast;
-        *ast = tmp;
-        token_free(token);
-        token = lexer_peek(lexer);
+        lexer_pop(lexer);
+        struct ast_node *child_command = parse_command(lexer, ast_node);
+        insert_children(list_node, child_command);
     };
 
-    return res;
+    return list_node;
 }

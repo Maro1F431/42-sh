@@ -1,53 +1,30 @@
 #ifndef AST_H
 #define AST_H
 
-// for building the ast we have to use the lex struct;
-
-/*
- * ast : It is a binary tree;
- * Thus as a left
- */
-
 enum ast_type
 {
     COMMAND = 0,
     AND,
     OR,
-    PIPE
+    PIPE,
+    LIST
 }
 
-struct ast
+struct ast_node
 {
     enum ast_type type;
-    union {
-        struct {
-            struct ast *left;
-            struct ast *right;
-        } children;
-        struct command;
-    } data;
+    size_t nb_children;
+    size_t children_array_size;
+    struct ast_node *children;
+    void *data
+    //maybe coding an 'insert_children' method would be nice to make sure a node has the 
+    //good children according to his type
 };
 
-static inline struct ast *left_child(struct ast *ast)
-{
-    return ast->data.children.left;
-}
-
-static inline struct ast *right_child(struct ast *ast)
-{
-    return ast->data.children.right;
-}
-
-struct command
-{
-    struct redirection[] redirections;// TODO LATER (week 2)
-    char[][] argv; //first arg is the command.
-};
+void insert_children(struct ast *ast);
 
 struct ast *ast_alloc(void);
 
 void ast_free(struct ast *ast);
-
-struct ast *ast_alloc_command(struct command);
 
 #endif
