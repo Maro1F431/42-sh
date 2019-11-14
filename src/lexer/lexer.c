@@ -305,8 +305,6 @@ static struct lex *lex(const char *str, struct lex *l)
         l = add_token(l, token);
         if (!l)
             return NULL;
-
-        i++;
     }
 
     l = add_eof(l);
