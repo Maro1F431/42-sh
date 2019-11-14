@@ -1,6 +1,10 @@
 #ifndef LEXER_H
 # define LEXER_H
 
+#define NB_TOKENS 35
+
+#include <stddef.h>
+
 enum token_type
 {
     END_OF_FILE = 0,
@@ -44,6 +48,12 @@ enum token_type
     DONE
 };
 
+struct token_map
+{
+    char *input;
+    enum token_type type;
+};
+
 struct token
 {
     char *value;
@@ -55,5 +65,10 @@ struct lex
 {
     struct token *head;
 };
+
+struct lex *lexer_alloc(const char *str);
+void lexer_free(struct lex *lexer);
+struct token *lexer_peek(struct lex *lexer);
+struct token *lexer_pop(struct lex *lexer);
 
 #endif /* LEXER_H */
