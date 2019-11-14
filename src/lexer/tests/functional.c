@@ -61,3 +61,13 @@ Test(functional, multiple_spaces)
 }
 
 
+Test(functional, one_word)
+{
+    char str[] = "ls";
+
+    struct lex *l = lexer_alloc(str);
+
+    cr_assert(l->head->type == WORD);
+    cr_assert(l->head->next->type == END_OF_FILE);
+    cr_assert(l->head->next->next == NULL);
+}

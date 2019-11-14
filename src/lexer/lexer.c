@@ -259,14 +259,19 @@ static struct token *match_type(const char *str,
 {
     char *word = get_word(str, ptr_i);
 
-    for (int i = 0; i < NB_TOKENS; i++)
+    unsigned i = 0;
+    while (i < NB_TOKENS)
     {
         if (!strcmp(word, g_token_map_list[i].input))
         {
             token->type = g_token_map_list[i].type;
             break;
         }
+        i++;
     }
+
+    if (i == NB_TOKENS)
+        token->type = WORD;
 
     free(word);
     return token;
