@@ -5,11 +5,11 @@
 
 enum ast_type
 {
-    COMMAND = 0,
-    AND,
-    OR,
-    PIPE,
-    LIST
+    AST_COMMAND = 0,
+    AST_AND,
+    AST_OR,
+    AST_PIPE,
+    AST_LIST
 };
 
 struct ast_node
@@ -23,9 +23,9 @@ struct ast_node
     //good children according to his type
 };
 
-void insert_children(struct ast_node *ast);
+void insert_children(struct ast_node *ast, struct ast_node *toinsert);
 
-struct ast *ast_alloc(void);
+struct ast_node *ast_node_alloc(void);
 
 void ast_free(struct ast_node *ast);
 

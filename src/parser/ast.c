@@ -1,11 +1,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ast.h"
-#include "lexer.h"
+#include "../lexer/lexer.h"
 
+
+//this is a test
 struct ast_node *ast_node_alloc(void)
 {
-    struct ast_node *res = malloc(sizeof(*res));
+    struct ast_node *res = malloc(sizeof(struct ast_node));
     memset(res, 0, sizeof(*res));
     res->nb_children = 0;
     res->children_array_size = 10;
@@ -26,8 +28,8 @@ void insert_children(struct ast_node *ast, struct ast_node *to_insert)
     {
         ast->children_array_size *= 2;
         ast->children = realloc(ast->children,
-            sizeof(struct ast_node) * res->children_array_size);
+            sizeof(struct ast_node) * ast->children_array_size);
     }
-    ast->children[ast->nb_children] = to_insert;
+    ast->children[ast->nb_children] = *to_insert;
     ast->nb_children += 1;
 }

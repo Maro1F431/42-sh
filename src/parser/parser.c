@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include "ast.h"
 #include "parser.h"
-#include "lexer.h"
+#include "../lexer/lexer.h"
 
-static struct *ast_node parse_simple_command(struct lexer *lexer)
+static struct ast_node *parse_simple_command(struct lex *lexer)
 {
     struct token *token = lexer_peek(lexer);
     if (!token)
@@ -12,7 +13,7 @@ static struct *ast_node parse_simple_command(struct lexer *lexer)
     if (token->type == WORD)
     {
         struct ast_node *cmd_node = ast_node_alloc();
-        cmd_node->type = COMMAND;
+        cmd_node->type = AST_COMMAND;
         while (lexer_peek(lexer)->type == WORD)
         {
             token = lexer_pop(lexer);
@@ -21,29 +22,32 @@ static struct *ast_node parse_simple_command(struct lexer *lexer)
             word_child->data = token->value;
             insert_children(cmd_node, word_child);
         }
+        //token_free(token);
+        return cmd_node;
     }
     else
         return NULL;
 
-    token_free(token);
-    return cmd_node;
+    //token_free(token);
+    //return cmd_node;
 }
 
-static struct *ast_node parse_list(struct lexer *lexer)
+static struct ast_node *parse_list(struct lex *lexer)
 {
-    if (!(struct ast_node *first_child_command 
-                = parse_shell_command(lexer, ast_node)))
+    struct ast_node *first_child_command;
+    if (!(first_child_command = parse_simple_command(lexer)))
         return NULL;
 
-    list_node = ast_node_alloc();
-    list_node->type = LIST;
+    struct ast_node *list_node = ast_node_alloc();
+    list_node->type = AST_LIST;
     insert_children(list_node, first_child_command);
-    while (lexer_peek(lexer)->type == SEMICOL)
+    while ((lexer_peek(lexer)->type) == SEMICOL)
     {
         lexer_pop(lexer);
-        struct ast_node *child_command = parse_simple_command(lexer, ast_node);
-        insert_children(list_node, child_command)simple;
+        struct ast_node *child_command = parse_simple_command(lexer);
+        insert_children(list_node, child_command);
     }
 
     return list_node;
 }
+
