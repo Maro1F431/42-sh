@@ -180,18 +180,10 @@ static struct lex *add_token(struct lex *l, struct token *token)
 
     if (!tail)
     {
-        l->head = malloc(sizeof(struct token));
-        if (!l->head)
-            return NULL;
-
         l->head = token;
         l->head->next = NULL;
         return l;
     }
-
-    tail->next = malloc(sizeof(struct token));
-    if (!tail->next)
-        return NULL;
 
     tail->next = token;
     tail->next->next = NULL;
@@ -276,6 +268,7 @@ static struct token *match_type(const char *str,
         }
     }
 
+    free(word);
     return token;
 }
 
@@ -343,7 +336,6 @@ struct lex *lexer_alloc(const char *str)
 
     return l;
 }
-
 /**
 ** \brief Wrapper to release every resources still held in a lexer.
 **
@@ -352,7 +344,9 @@ struct lex *lexer_alloc(const char *str)
 void lexer_free(struct lex *lexer)
 {
     while (lexer_peek(lexer))
+    {
         free(lexer_pop(lexer));
+    }
 
     free(lexer);
 }

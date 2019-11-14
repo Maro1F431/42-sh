@@ -15,6 +15,6 @@ int main(void)
         token = token->next;
     }
     printf("\n");
-
+    lexer_free(l);
     return 0;
 }
