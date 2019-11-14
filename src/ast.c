@@ -28,6 +28,6 @@ void insert_children(struct ast_node *ast, struct ast_node *to_insert)
         ast->children = realloc(ast->children,
             sizeof(struct ast_node) * res->children_array_size);
     }
-    ast->children[ast->nb_children] = *to_insert;
+    ast->children[ast->nb_children] = to_insert;
     ast->nb_children += 1;
 }

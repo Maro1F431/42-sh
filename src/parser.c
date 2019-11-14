@@ -3,7 +3,7 @@
 #include "parser.h"
 #include "lexer.h"
 
-static struct *ast_node parse_command(struct lexer *lexer)
+static struct *ast_node parse_simple_command(struct lexer *lexer)
 {
     struct token *token = lexer_peek(lexer);
     if (!token)
@@ -29,10 +29,10 @@ static struct *ast_node parse_command(struct lexer *lexer)
     return cmd_node;
 }
 
-static bool parse_list(struct lexer *lexer)
+static struct *ast_node parse_list(struct lexer *lexer)
 {
     if (!(struct ast_node *first_child_command 
-                = parse_command(lexer, ast_node)))
+                = parse_shell_command(lexer, ast_node)))
         return NULL;
 
     list_node = ast_node_alloc();
@@ -41,9 +41,9 @@ static bool parse_list(struct lexer *lexer)
     while (lexer_peek(lexer)->type == SEMICOL)
     {
         lexer_pop(lexer);
-        struct ast_node *child_command = parse_command(lexer, ast_node);
-        insert_children(list_node, child_command);
-    };
+        struct ast_node *child_command = parse_simple_command(lexer, ast_node);
+        insert_children(list_node, child_command)simple;
+    }
 
     return list_node;
 }

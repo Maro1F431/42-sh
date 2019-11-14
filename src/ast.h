@@ -16,7 +16,7 @@ struct ast_node
     size_t nb_children;
     size_t children_array_size;
     struct ast_node *children;
-    void *data
+    void *data;
     //maybe coding an 'insert_children' method would be nice to make sure a node has the 
     //good children according to his type
 };
