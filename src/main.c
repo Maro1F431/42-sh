@@ -5,13 +5,10 @@
 
 int main()
 {
-    char str[] = "echo wow ;";
+    char str[] = "echo wow ; echo wow2";
     struct lex *l = lexer_alloc(str);
-    //lexer_pop(l);
-    printf("%s", l->head->value);
     struct ast_node *ast = parse_list(l);
-    //printf("%s", l->head->value);
-    //char *s = (ast->children[0].data);
-   // printf("%s", s);
+    char *s = (ast->children[1].children[1].data);
+    printf("%s", s);
 }
 
