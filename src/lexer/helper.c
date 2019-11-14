@@ -48,6 +48,7 @@ char *get_word(const char *str, size_t *ptr_i)
     }
     word[j] = '\0';
 
+    *ptr_i = i;
     return word;
 }
 
