@@ -84,6 +84,10 @@ Test(functional, multiple_words_word)
     cr_assert(l->head->next->next->type == WORD);
     cr_assert(l->head->next->next->next->type == END_OF_FILE);
     cr_assert(l->head->next->next->next->next == NULL);
+
+    cr_assert_str_eq(l->head->value, "echo");
+    cr_assert_str_eq(l->head->next->value, "hello");
+    cr_assert_str_eq(l->head->next->next->value, "there");
 }
 
 

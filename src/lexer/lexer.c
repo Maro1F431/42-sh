@@ -271,9 +271,13 @@ static struct token *match_type(const char *str,
     }
 
     if (i == NB_TOKENS)
+    {
         token->type = WORD;
+        token->value = word;
+    }
+    else
+        free(word);
 
-    free(word);
     return token;
 }
 
