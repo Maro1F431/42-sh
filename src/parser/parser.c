@@ -45,7 +45,8 @@ struct ast_node *parse_list(struct lex *lexer)
     {
         lexer_pop(lexer);
         struct ast_node *child_command = parse_simple_command(lexer);
-        insert_children(list_node, child_command);
+        if (child_command != NULL)
+            insert_children(list_node, child_command);
     }
 
     return list_node;
