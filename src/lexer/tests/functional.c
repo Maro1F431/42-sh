@@ -71,3 +71,20 @@ Test(functional, one_word)
     cr_assert(l->head->next->type == END_OF_FILE);
     cr_assert(l->head->next->next == NULL);
 }
+
+
+Test(functional, multiple_words_word)
+{
+    char str[] = "echo hello there";
+
+    struct lex *l = lexer_alloc(str);
+
+    cr_assert(l->head->type == WORD);
+    cr_assert(l->head->next->type == WORD);
+    cr_assert(l->head->next->next->type == WORD);
+    cr_assert(l->head->next->next->next->type == END_OF_FILE);
+    cr_assert(l->head->next->next->next->next == NULL);
+}
+
+
+
