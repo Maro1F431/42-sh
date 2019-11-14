@@ -254,11 +254,9 @@ size_t nb_digits(int value)
 ** \param str the input string
 ** \param ptr_i a pointer to the index where the word to identify starts
 */
-static struct token *match_type(const char *str,
+static struct token *match_type(char *word,
         struct token *token, size_t *ptr_i)
 {
-    char *word = get_word(str, ptr_i);
-
     unsigned i = 0;
     while (i < NB_TOKENS)
     {
@@ -277,8 +275,81 @@ static struct token *match_type(const char *str,
     return token;
 }
 
+static char *get_next_token(const char *str, size_t *ptr_i)
+{
+    size_t i = *ptr_i;
 
+    int delimited = 0;
+    size_t start = i;
 
+    while (!delimited)
+    {
+        //1
+        if (str[i] == '\0')
+        {
+            if (start == i)
+                //return eof
+            else
+                //delimiter le token
+        }
+        //2,3
+        else if (is_operator(str, start, i - 1))
+        {
+            if (is_operator(str, start, i))
+                i++;
+            else
+            {
+                //delimiter
+                delimited = 1;
+            }
+        }
+        //6
+        else if (is_operator(str, i, i))
+        {
+            //delimiter
+            delimited = 1;
+        }
+        //7
+        else if (str[i] == '\n')
+        {
+            //delimiter
+            delimited = 1;
+        }
+        //8
+        else if (isblank(str[i]))
+        {
+            if (start == i)
+            {
+                start++;
+                i++;
+            }
+            else
+            {
+                //delimiter
+                delimited = 1;
+            }
+        }
+        //9
+        else if (is_word(str, start, i - 1))
+        {
+            i++;
+        }
+        else
+        {
+            start = i;
+        }
+    }
+}
+
+static struct token *token_recognition(const char *str, struct lex *l, size_t *ptr_i)
+{
+    char *next_token_word = get_next_token(str, ptr_i);
+    struct token *new_token = malloc(sizeof(struct token));
+
+    match_type(next_token_word, new_token, ptr_i);
+
+    return new_token;
+}
 
 /**
 ** \brief build a lexer from the input string and a malloc'd lexer
@@ -290,33 +361,20 @@ static struct token *match_type(const char *str,
 static struct lex *lex(const char *str, struct lex *l)
 {
     size_t i = 0;
-    while (str[i] != '\0')
+    int is_EOF = 0;
+    while (!is_EOF)
     {
-        i = skip_space(str, i);
-
-        if (str[i] == '\0')
-            break;
-
         struct token *token = malloc(sizeof(struct token));
-        token = match_type(str, token, &i);
         if (!token)
             return NULL;
-
+        token = token_recognition(str, l, &i);
         l = add_token(l, token);
-        if (!l)
-            return NULL;
+
+        if (token->type == END_OF_FILE)
+            is_EOF = 1;
     }
-
-    l = add_eof(l);
-    if (!l)
-        return NULL;
-
     return l;
 }
-
-
-
-
 
 
 /**
