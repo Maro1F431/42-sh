@@ -1,6 +1,8 @@
 #ifndef AST_H
 #define AST_H
 
+#include <stddef.h>
+
 enum ast_type
 {
     COMMAND = 0,
@@ -8,7 +10,7 @@ enum ast_type
     OR,
     PIPE,
     LIST
-}
+};
 
 struct ast_node
 {
@@ -21,10 +23,10 @@ struct ast_node
     //good children according to his type
 };
 
-void insert_children(struct ast *ast);
+void insert_children(struct ast_node *ast);
 
 struct ast *ast_alloc(void);
 
-void ast_free(struct ast *ast);
+void ast_free(struct ast_node *ast);
 
 #endif
