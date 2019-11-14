@@ -149,7 +149,12 @@ struct token_map g_token_map_list[NB_TOKENS] =
     }
 };
 
-// get last element of list
+/**
+** \brief get last element of list
+**
+** \return the last token of the list
+** \param l the lexer to get the last element from
+*/
 static struct token *get_tail(struct lex *l)
 {
     if (!l->head)
@@ -162,7 +167,13 @@ static struct token *get_tail(struct lex *l)
     return current_token;
 }
 
-// add token at end of linked list
+/**
+** \brief add token at the end of the linked list
+**
+** \return the updated lexer
+** \param l the lexer to add the element to
+** \param token the token to add to the lexer
+*/
 static struct lex *add_token(struct lex *l, struct token *token)
 {
     struct token *tail = get_tail(l);
@@ -189,6 +200,12 @@ static struct lex *add_token(struct lex *l, struct token *token)
 }
 
 
+/**
+** \brief add the end of file character to the lexer
+**
+** \return the updated lexer
+** \param l the lexer to add the end of file element to
+*/
 static struct lex *add_eof(struct lex *l)
 {
     struct token *eof = malloc(sizeof(struct token));
@@ -209,6 +226,12 @@ static struct lex *add_eof(struct lex *l)
 }
 
 
+/**
+** \brief counts the number of digits of the given integer
+**
+** \return the number of digits
+** \param value the integer to count the digits from
+*/
 size_t nb_digits(int value)
 {
     size_t res = 0;
@@ -231,11 +254,14 @@ size_t nb_digits(int value)
 
 
 
-// associate a token type to a word of the input string
-// str : input string
-// token : the current token which will receive the type of token
-// ptr_i : a pointer to the index where the word to identify starts
-//          (muste be incremented by the size of the identified word)
+/**
+** \brief associate a token type to a word of the input string
+**
+** \return the matched token
+** \param token the token that has to have its type modified
+** \param str the input string
+** \param ptr_i a pointer to the index where the word to identify starts
+*/
 static struct token *match_type(const char *str,
         struct token *token, size_t *ptr_i)
 {
@@ -256,6 +282,13 @@ static struct token *match_type(const char *str,
 
 
 
+/**
+** \brief build a lexer from the input string and a malloc'd lexer
+**
+** \return the built lexer
+** \param str the input string
+** \param l the malloc'd lexer to build to
+*/
 static struct lex *lex(const char *str, struct lex *l)
 {
     size_t i = 0;
@@ -319,14 +352,13 @@ struct lex *lexer_alloc(const char *str)
 void lexer_free(struct lex *lexer)
 {
     while (lexer_peek(lexer))
-        lexer_pop(lexer);
+        free(lexer_pop(lexer));
 
     free(lexer);
 }
 
 /**
 ** \brief Return the first token from the input stream without consuming it.
-
 **
 ** \return the next token from the input stream
 ** \param lexer the lexer to lex from
