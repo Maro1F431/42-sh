@@ -287,13 +287,12 @@ static struct lex *lex(const char *str, struct lex *l)
     size_t i = 0;
     while (str[i] != '\0')
     {
-        struct token *token = malloc(sizeof(struct token));
-        while (str[i] == ' ')
-            i++;
+        i = skip_space(str, i);
 
         if (str[i] == '\0')
             break;
 
+        struct token *token = malloc(sizeof(struct token));
         token = match_type(str, token, &i);
         if (!token)
             return NULL;
