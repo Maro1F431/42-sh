@@ -4,7 +4,7 @@
 
 int main(void)
 {
-    char str[] = "   	\n";
+    char str[] = "this is a command;";
 
     struct lex *l = lexer_alloc(str);
 
