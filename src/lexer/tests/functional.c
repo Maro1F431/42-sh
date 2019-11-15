@@ -122,4 +122,19 @@ Test(functional, double_chev_simple_chev)
 
 
 
+Test(functional, multiple_operators_with_no_space)
+{
+    char str[] = "<<;!)(";
+
+    struct lex *l = lexer_alloc(str);
+
+    cr_assert(l->head->type == CHEV_DOUBLE_L);
+    cr_assert(l->head->next->type == SEMICOL);
+    cr_assert(l->head->next->next->type == EXCLAMATION);
+    cr_assert(l->head->next->next->next->type == CLOSE_PAR);
+    cr_assert(l->head->next->next->next->next->type == OPEN_PAR);
+    cr_assert(l->head->next->next->next->next->next->type == END_OF_FILE);
+    cr_assert(l->head->next->next->next->next->next->next == NULL);
+}
+
 
