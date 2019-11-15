@@ -9,6 +9,7 @@ int main()
     struct lex *l = lexer_alloc(str);
     struct ast_node *ast = parse_list(l);
     ast_node_free(ast);
+    lexer_free(l);
     free(ast);
 }
 

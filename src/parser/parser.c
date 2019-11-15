@@ -21,8 +21,8 @@ struct ast_node *parse_simple_command(struct lex *lexer)
             word_child->type = AST_WORD;
             word_child->data = token->value;
             insert_children(cmd_node, word_child);
+            token_free(token);
         }
-        //token_free(token);
         return cmd_node;
     }
     else
@@ -40,7 +40,7 @@ struct ast_node *parse_list(struct lex *lexer)
     insert_children(list_node, first_child_command);
     while ((lexer_peek(lexer)->type) == SEMICOL)
     {
-        lexer_pop(lexer);
+        token_free(lexer_pop(lexer));
         struct ast_node *child_command = parse_simple_command(lexer);
         if (child_command != NULL)
             insert_children(list_node, child_command);

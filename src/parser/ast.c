@@ -22,7 +22,7 @@ void ast_node_free(struct ast_node *ast)
     //TODO, FREE the children list and everything else;
     if (ast->nb_children != 0)
     {
-        for (int i = 0; i < ast->nb_children; i++)
+        for (size_t i = 0; i < ast->nb_children; i++)
         {
             ast_node_free(&(ast->children[i]));
         }
