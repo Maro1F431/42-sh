@@ -73,6 +73,42 @@ void ast_node_free_children(struct ast_node *ast)
     }
 }
 
+void print_ast(struct ast_node *ast)
+{
+    //TODO, FREE the children list and everything else;
+    if (ast->nb_children != 0)
+    {
+        print_type(ast->type);
+        for (size_t i = 0; i < ast->nb_children; i++)
+        {
+            print_ast(&(ast->children[i]));
+        }
+    }
+    else
+    {
+        print_type(ast->type);
+    }
+}
+
+void print_type(int i)
+{
+    if (i == 0)
+        printf("COMMAND\n");
+    if (i == 1)
+        printf("AND\n");
+    if (i == 2)
+        printf("OR\n");
+    if (i == 3)
+        printf("PIPE\n");
+    if (i == 4)
+        printf("LIST\n");
+    if (i == 5)
+        printf("IF\n");
+    if (i == 6)
+        printf("WORD\n");
+}
+
+
 void insert_children(struct ast_node *ast, struct ast_node to_insert)
 {
     //TODO, CHECK IF to_insert type match AST type for insertion as a child.
