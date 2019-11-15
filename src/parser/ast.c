@@ -2,10 +2,52 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
+#include <unistd.h>
+#include <sys/wait.h>
 #include "../lexer/lexer.h"
 
 
-//this is a test
+void execute(struct ast_node *ast)
+{
+    if (ast->nb_children != 0)
+    {
+        for (int i = 0; i < ast->nb_children ; i++)
+        {
+            execute(&(ast->children[i]));
+        }
+        if (ast->type == AST_COMMAND)
+            execute_command(ast);
+    }
+}
+
+void execute_command(struct ast_node *ast)
+{
+    char **str = calloc(sizeof(char*), 50);
+    int ind = 0;
+    for (int i = 0; i < ast->nb_children; i++)
+    {
+        str[ind] = ast->children[i].data;
+    }
+    char *shebangs = "/bin/";
+    char *real_shebangs = calloc(sizeof(char), 50);
+    sprintf(real_shebangs, "%s%s", shebangs, str[0]);
+    pid_t cpid;
+    int status;
+    cpid = fork();
+    if (!cpid)
+        execve(real_shebangs, str, NULL);
+    else
+    {
+        waitpid(cpid, &status, 0);
+        free(real_shebangs);
+        for (int i = 0; i < 50; i++)
+        {
+            free(str[i]);
+        }
+        free(str);
+    }
+}
+
 struct ast_node *ast_node_alloc(void)
 {
     struct ast_node *res = malloc(sizeof(struct ast_node));

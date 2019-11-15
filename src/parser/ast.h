@@ -23,8 +23,11 @@ struct ast_node
     //maybe coding an 'insert_children' method would be nice to make sure a node has the 
     //good children according to his type
 };
+void execute(struct ast_node *ast);
 
 void insert_children(struct ast_node *ast, struct ast_node *toinsert);
+
+void execute_command(struct ast_node *ast);
 
 struct ast_node *ast_node_alloc(void);
 
