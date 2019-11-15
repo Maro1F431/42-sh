@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "ast.h"
 #include "../lexer/lexer.h"
 
@@ -19,6 +20,18 @@ struct ast_node *ast_node_alloc(void)
 void ast_node_free(struct ast_node *ast)
 {
     //TODO, FREE the children list and everything else;
+    if (ast->nb_children != 0)
+    {
+        for (int i = 0; i < ast->nb_children; i++)
+        {
+            ast_node_free(&(ast->children[i]));
+        }
+        free(ast->children);
+    }
+    else
+    {
+        free(ast->children);
+    }
 }
 
 void insert_children(struct ast_node *ast, struct ast_node *to_insert)
@@ -31,5 +44,6 @@ void insert_children(struct ast_node *ast, struct ast_node *to_insert)
             sizeof(struct ast_node) * ast->children_array_size);
     }
     ast->children[ast->nb_children] = *to_insert;
+    free(to_insert);
     ast->nb_children += 1;
 }

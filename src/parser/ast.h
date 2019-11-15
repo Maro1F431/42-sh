@@ -9,7 +9,8 @@ enum ast_type
     AST_AND,
     AST_OR,
     AST_PIPE,
-    AST_LIST
+    AST_LIST,
+    AST_WORD
 };
 
 struct ast_node
@@ -27,6 +28,6 @@ void insert_children(struct ast_node *ast, struct ast_node *toinsert);
 
 struct ast_node *ast_node_alloc(void);
 
-void ast_free(struct ast_node *ast);
+void ast_node_free(struct ast_node *ast);
 
 #endif

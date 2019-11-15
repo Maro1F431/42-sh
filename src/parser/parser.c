@@ -18,7 +18,7 @@ struct ast_node *parse_simple_command(struct lex *lexer)
         {
             token = lexer_pop(lexer);
             struct ast_node *word_child = ast_node_alloc();
-            word_child->type = WORD;
+            word_child->type = AST_WORD;
             word_child->data = token->value;
             insert_children(cmd_node, word_child);
         }
@@ -27,9 +27,6 @@ struct ast_node *parse_simple_command(struct lex *lexer)
     }
     else
         return NULL;
-
-    //token_free(token);
-    //return cmd_node;
 }
 
 struct ast_node *parse_list(struct lex *lexer)
