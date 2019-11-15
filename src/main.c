@@ -5,7 +5,7 @@
 
 int main()
 {
-    char str[] = "echo1 wow ; if echo 2 then echo 3 else echo 4 ;";
+    char str[] = "echo wow";
     struct lex *l = lexer_alloc(str);
     struct ast_node ast;
     ast_node_init(&ast);
@@ -14,6 +14,9 @@ int main()
     else
         printf("failure\n");
     print_ast(&ast);
+    //char *test = ast.children[0].children[0].data;
+    //printf("test %d", ast.children[0].children[0].type);
+    execute(&ast);
     ast_node_free_children(&ast);
     lexer_free(l);
 }

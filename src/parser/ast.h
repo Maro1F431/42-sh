@@ -28,7 +28,7 @@ void execute(struct ast_node *ast);
 
 void insert_children(struct ast_node *ast, struct ast_node to_insert);
 
-void execute_command(struct ast_node *ast);
+int execute_command(struct ast_node *ast);
 void ast_node_init(struct ast_node *ast);
 void ast_node_free_children(struct ast_node *ast);
 void print_ast(struct ast_node *ast);

@@ -3,6 +3,7 @@
 #include <err.h>
 #include "ast.h"
 #include "parser.h"
+#include <stdio.h>
 #include "../lexer/lexer.h"
 
 
@@ -28,7 +29,9 @@ bool parse_simple_command(struct lex *lexer, struct ast_node *s_cmd_node)
             struct ast_node word_child;
             ast_node_init(&word_child);
             word_child.type = AST_WORD;
+            //printf("%s\n", token->value);
             word_child.data = token->value;
+            char *test = word_child.data;
             insert_children(s_cmd_node, word_child);
             token_free(token);
         }

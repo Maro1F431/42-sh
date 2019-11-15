@@ -11,28 +11,42 @@ void execute(struct ast_node *ast)
 {
     if (ast->nb_children != 0)
     {
+        if (ast->type == AST_COMMAND)
+            execute_command(ast);
+        if (ast->type == AST_IF)
+        {
+            if (execute_command(&(ast->children[0])) == 1)
+                execute(&(ast->children[1]));
+            else if (ast->nb_children == 3)
+                execute(&(ast->children[2]));
+        }
         for (size_t i = 0; i < ast->nb_children ; i++)
         {
             execute(&(ast->children[i]));
         }
-        if (ast->type == AST_COMMAND)
-            execute_command(ast);
     }
 }
 
-void execute_command(struct ast_node *ast)
+int execute_command(struct ast_node *ast)
 {
     char **str = calloc(sizeof(char*), 50);
     int ind = 0;
     for (size_t i = 0; i < ast->nb_children; i++)
     {
+        //char *ok = ast->children[i].data;
+        //printf("%s", ok);
+        if ( ast->children[i].data == NULL)
+            printf("Data is NULL");
         str[ind] = ast->children[i].data;
+        ind++;
     }
+    printf(" m  %s", str[0]);
     char *shebangs = "/bin/";
     char *real_shebangs = calloc(sizeof(char), 50);
     sprintf(real_shebangs, "%s%s", shebangs, str[0]);
     pid_t cpid;
     int status;
+    printf("%s", real_shebangs);
     cpid = fork();
     if (!cpid)
         execve(real_shebangs, str, NULL);
@@ -40,12 +54,13 @@ void execute_command(struct ast_node *ast)
     {
         waitpid(cpid, &status, 0);
         free(real_shebangs);
-        for (int i = 0; i < 50; i++)
+        /*for (int i = 0; i < 50; i++)
         {
             free(str[i]);
         }
-        free(str);
+        free(str);*/
     }
+    return 1;
 }
 //this is a test
 void ast_node_init(struct ast_node *ast)
@@ -86,7 +101,9 @@ void print_ast(struct ast_node *ast)
     }
     else
     {
+        char *test = ast->data;
         print_type(ast->type);
+        printf("whut %s\n", test);
     }
 }
 
