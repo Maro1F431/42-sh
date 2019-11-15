@@ -258,7 +258,7 @@ static struct token *match_type(const char *str,
         struct token *token, size_t *ptr_i)
 {
     char *word = get_word(str, ptr_i);
-
+    token->value = NULL;
     unsigned i = 0;
     while (i < NB_TOKENS)
     {
@@ -319,7 +319,15 @@ static struct lex *lex(const char *str, struct lex *l)
 }
 
 
-
+void token_free(struct token *token)
+{
+    if (token)
+    {
+        if (token->value)
+            free(token->value);
+        free(token);
+    }
+}
 
 
 
@@ -351,7 +359,7 @@ void lexer_free(struct lex *lexer)
 {
     while (lexer_peek(lexer))
     {
-        free(lexer_pop(lexer));
+        token_free(lexer_pop(lexer));
     }
 
     free(lexer);
