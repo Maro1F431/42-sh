@@ -3,7 +3,6 @@
 
 struct ast_node;
 struct lex;
-struct ast_node *parse_simple_command(struct lex *lexer);
-
-struct ast_node *parse_list(struct lex *lexer);
+bool parse_simple_command(struct lex *lexer, struct ast_node *cmd_node);
+bool parse_list(struct lex *lexer, struct ast_node *list_node);
 #endif
