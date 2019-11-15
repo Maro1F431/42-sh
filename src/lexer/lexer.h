@@ -7,26 +7,25 @@
 
 enum token_type
 {
+    // context 
     END_OF_FILE = 0,
     IONUMBER,
     WORD,
     HEREDOC,
     ASSIGNMENT_WORD,
-    LINE_BREAK,
-    SEMICOL,
-    DOUBLE_SEMICOL,
+
+    // control operators
     AMPERSAND,
     DOUBLE_AMPERSAND,
-    PIPE,
     DOUBLE_PIPE,
-    EXCLAMATION,
-    OPEN_CURLY_BRACKET,
-    CLOSE_CURLY_BRACKET,
+    PIPE,
     OPEN_PAR,
     CLOSE_PAR,
-    FUNCTION,
-    CHEV_SIMPLE_R,
-    CHEV_SIMPLE_L,
+    SEMICOL,
+    DOUBLE_SEMICOL,
+    LINE_BREAK,
+
+    // redirection operators
     CHEV_DOUBLE_R,
     CHEV_DOUBLE_L,
     CHEV_DOUBLE_H,
@@ -34,6 +33,10 @@ enum token_type
     CHEV_AMP_L,
     CHEV_PIPE,
     LEFT_RIGHT,
+    CHEV_SIMPLE_R,
+    CHEV_SIMPLE_L,
+
+    // reserved words
     WHILE,
     UNTIL,
     CASE,
@@ -45,7 +48,11 @@ enum token_type
     ELSE,
     ELIF,
     DO,
-    DONE
+    DONE,
+    OPEN_CURLY_BRACKET,
+    CLOSE_CURLY_BRACKET,
+    EXCLAMATION,
+    FUNCTION
 };
 
 struct token_map

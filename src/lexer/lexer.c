@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 struct token_map g_token_map_list[NB_TOKENS] =
 {
@@ -197,7 +198,7 @@ static struct lex *add_token(struct lex *l, struct token *token)
 **
 ** \return the updated lexer
 ** \param l the lexer to add the end of file element to
-*/
+
 static struct lex *add_eof(struct lex *l)
 {
     struct token *eof = malloc(sizeof(struct token));
@@ -216,7 +217,7 @@ static struct lex *add_eof(struct lex *l)
 
     return l;
 }
-
+*/
 
 /**
 ** \brief counts the number of digits of the given integer
@@ -254,9 +255,14 @@ size_t nb_digits(int value)
 ** \param str the input string
 ** \param ptr_i a pointer to the index where the word to identify starts
 */
-static struct token *match_type(char *word,
-        struct token *token, size_t *ptr_i)
+static struct token *match_type(char *word, struct token *token)
 {
+    if (word[0] == '\0')
+    {
+        token->type = END_OF_FILE;
+        return token;
+    }
+
     unsigned i = 0;
     while (i < NB_TOKENS)
     {
@@ -269,33 +275,104 @@ static struct token *match_type(char *word,
     }
 
     if (i == NB_TOKENS)
+    {
         token->type = WORD;
+        token->value = word;
+    }
+    else
+        free(word);
 
-    free(word);
     return token;
 }
 
+
+static char *end_of_file(void)
+{
+    char *res = malloc(sizeof(char));
+    res[0] = '\0';
+
+    return res;
+}
+
+
+static char *delimit(const char *str, int start, int end)
+{
+    if (end <= start)
+        return NULL;
+
+    size_t len = end - start;
+    char *res = malloc((len + 1) * sizeof(char));
+
+    for (size_t i = 0; i < len; i++)
+    {
+        res[i] = str[start + i];
+    }
+    res[len] = '\0';
+
+    return res;
+}
+
+
+/*
+ * \brief Check if string between start and end in str
+ *  can be part of an operator
+*/
+static int is_operator(const char *str, int start, int end)
+{
+    char *word = delimit(str, start, end);
+    int token_type = -1;
+
+    unsigned i = 0;
+    while (i < NB_TOKENS)
+    {
+        if (!strncmp(word, g_token_map_list[i].input, end - start))
+        {
+            token_type = g_token_map_list[i].type;
+            break;
+        }
+        i++;
+    }
+
+    free(word);
+    return (token_type >= AMPERSAND && token_type <= CHEV_SIMPLE_L);
+}
+
+
+static int is_word(const char *str, int start, int end)
+{
+    return !is_operator(str, start, end);
+}
+
+
 static char *get_next_token(const char *str, size_t *ptr_i)
 {
-    size_t i = *ptr_i;
+    int i = *ptr_i;
 
     int delimited = 0;
-    size_t start = i;
+    int start = i;
 
-    while (!delimited)
+    char *res = end_of_file();
+
+    while (!delimited || start == i)
     {
         //1
         if (str[i] == '\0')
         {
             if (start == i)
+            {
                 //return eof
+                return res;
+            }
             else
+            {
                 //delimiter le token
+                delimited = 1;
+            }
         }
         //2,3
-        else if (is_operator(str, start, i - 1))
+        else if (start < i && is_operator(str, start, i))
         {
-            if (is_operator(str, start, i))
+            if (is_operator(str, start, i + 1))
                 i++;
             else
             {
@@ -304,10 +381,15 @@ static char *get_next_token(const char *str, size_t *ptr_i)
             }
         }
         //6
-        else if (is_operator(str, i, i))
+        else if (is_operator(str, i, i + 1))
         {
-            //delimiter
-            delimited = 1;
+            if (start == i)
+                i++;
+            else
+            {
+                //delimiter
+                delimited = 1;
+            }
         }
         //7
         else if (str[i] == '\n')
@@ -330,23 +412,32 @@ static char *get_next_token(const char *str, size_t *ptr_i)
             }
         }
         //9
-        else if (is_word(str, start, i - 1))
+        else if (is_word(str, start, i))
         {
             i++;
         }
-        else
+        else // 11
         {
             start = i;
         }
     }
+
+    free(res);
+    res = delimit(str, start, i);
+    *ptr_i = i;
+    return res;
 }
 
-static struct token *token_recognition(const char *str, struct lex *l, size_t *ptr_i)
+
+/*
+ * \ brief Returns next token
+*/
+static struct token *token_recognition(const char *str, size_t *ptr_i)
 {
     char *next_token_word = get_next_token(str, ptr_i);
     struct token *new_token = malloc(sizeof(struct token));
 
-    match_type(next_token_word, new_token, ptr_i);
+    match_type(next_token_word, new_token);
 
     return new_token;
 }
@@ -367,7 +458,7 @@ static struct lex *lex(const char *str, struct lex *l)
         struct token *token = malloc(sizeof(struct token));
         if (!token)
             return NULL;
-        token = token_recognition(str, l, &i);
+        token = token_recognition(str, &i);
         l = add_token(l, token);
 
         if (token->type == END_OF_FILE)
