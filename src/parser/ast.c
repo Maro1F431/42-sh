@@ -11,7 +11,7 @@ void execute(struct ast_node *ast)
 {
     if (ast->nb_children != 0)
     {
-        for (int i = 0; i < ast->nb_children ; i++)
+        for (size_t i = 0; i < ast->nb_children ; i++)
         {
             execute(&(ast->children[i]));
         }
@@ -24,7 +24,7 @@ void execute_command(struct ast_node *ast)
 {
     char **str = calloc(sizeof(char*), 50);
     int ind = 0;
-    for (int i = 0; i < ast->nb_children; i++)
+    for (size_t i = 0; i < ast->nb_children; i++)
     {
         str[ind] = ast->children[i].data;
     }
