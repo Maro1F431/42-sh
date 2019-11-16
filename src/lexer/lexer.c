@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include "lexer.h"
 #include "token.h"
 #include "token_rec.h"
@@ -163,6 +165,20 @@ struct token *lexer_pop_command(struct lex *lexer)
         get_input(lexer, lexer->in_type);
 
     struct token *next_token = lex(lexer->input, &(lexer->i), MODE_CMD);
+
+    return next_token;
+
+}
+
+
+struct token *lexer_peek_command(struct lex *lexer)
+{
+    if (lexer->i >= lexer->len || lexer->len == 0)
+        get_input(lexer, lexer->in_type);
+
+    size_t i = lexer->i;
+    struct token *next_token = lex(lexer->input, &i, MODE_CMD);
+
 
     return next_token;
 
