@@ -15,10 +15,11 @@ struct lex
 {
     size_t i;
     size_t len;
-    const char *input;
+    char *input;
+    int malloc_input;
 };
 
-struct lex *lexer_alloc(const char *str);
+struct lex *lexer_alloc(char *str);
 void lexer_free(struct lex *lexer);
 struct token *lexer_peek(struct lex *lexer);
 struct token *lexer_pop(struct lex *lexer);
