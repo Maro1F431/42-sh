@@ -11,10 +11,19 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <signal.h>
+#include <errno.h>
+#include <pwd.h>
 #define GNU_SOURCE
 #define SIZE 100
+
+void sigint_handler(int signo) {
+}
+
+
 void interactive_mode(void)
 {
+    signal(SIGINT, sigint_handler);
     int tty;
     tty = isatty(STDIN_FILENO);
     while (1)
@@ -40,6 +49,10 @@ void interactive_mode(void)
 void parse_file(char *file)
 {
     FILE *file_desrciptor = fopen(file, "r");
+    if (file_desrciptor == NULL)
+    {
+        return;
+    }
     ssize_t size;
     size_t buffsize;
     char *buff = NULL;
@@ -55,15 +68,33 @@ void parse_file(char *file)
     }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[], char *env[])
 {
     if (argc == 1)
+    {
+        char *home = getenv("HOME");
+        char *full_path = calloc(sizeof(char), 60);
+        sprintf(full_path, "%s/.42shrc", home);
+        parse_file("etc/42shrc");
+        parse_file(full_path);
+        free(full_path);
         interactive_mode();
+    }
     else
     {
         struct option opt;
         init_option(&opt);
         int k = parse_option(&opt, argc, argv);
+        if (opt.flag_norc == 0)
+        {
+            char *home = getenv("HOME");
+            char *full_path = calloc(sizeof(char), 60);
+            sprintf(full_path, "%s/.42shrc", home);
+            //puts(full_path);
+            parse_file("etc/42shrc");
+            parse_file(full_path);
+            free(full_path);
+        }
         struct stat finfo;
         // change the case k == argc ; interactive mode with option
         int index_files = lstat(argv[k], &finfo);
@@ -95,20 +126,5 @@ int main(int argc, char *argv[])
             parse_file(argv[k]);
         }
     }
-    /*char str[] = "echo wow ; echo omg ; if echo 1 then echo 2 else echo 3 ;";
-    struct lex *l = lexer_alloc(str);
-    struct ast_node ast;
-    ast_node_init(&ast);
-    if (parse_list(l, &ast))
-        printf("succes\n");
-    else
-        printf("failure\n");
-    print_ast(&ast);
-    //char *test = ast.children[0].children[0].data;
-    //printf("test %d", ast.children[0].children[0].type);
-    //printf("EXEC TIME\n");
-    execute(&ast);
-    ast_node_free_children(&ast);
-    lexer_free(l);*/
 }
 

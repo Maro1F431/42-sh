@@ -11,7 +11,7 @@
 bool parse_simple_command(struct lex *lexer, struct ast_node *s_cmd_node)
 {
     struct token *token = lexer_peek(lexer);
-    if (!token)
+    if (!token) //if token->type == EOF
         return false;
 
     if (token->type == WORD || token->type == ASSIGNMENT_WORD)
