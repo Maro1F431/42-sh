@@ -85,6 +85,8 @@ void ast_node_free_children(struct ast_node *ast)
     else
     {
         free(ast->children);
+        if (ast->data)
+            free(ast->data);
     }
 }
 
@@ -101,28 +103,29 @@ void print_ast(struct ast_node *ast)
     }
     else
     {
-        char *test = ast->data;
         print_type(ast->type);
-        printf("whut %s\n", test);
+        printf("%s\n", (char*)(ast->data));
     }
 }
 
 void print_type(int i)
 {
     if (i == 0)
+        printf("SIMPLE_COMMAND\n");
+    else if (i == 1)
         printf("COMMAND\n");
-    if (i == 1)
+    else if (i == 2)
         printf("AND\n");
-    if (i == 2)
+    else if (i == 3)
         printf("OR\n");
-    if (i == 3)
+    else if (i == 4)
         printf("PIPE\n");
-    if (i == 4)
+    else if (i == 5)
         printf("LIST\n");
-    if (i == 5)
+    else if (i == 6)
         printf("IF\n");
-    if (i == 6)
-        printf("WORD\n");
+    else if (i == 7)
+        printf("WORD: ");
 }
 
 

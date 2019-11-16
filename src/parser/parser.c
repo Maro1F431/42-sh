@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <err.h>
 #include "ast.h"
 #include "parser.h"
@@ -15,7 +16,7 @@ bool parse_simple_command(struct lex *lexer, struct ast_node *s_cmd_node)
 
     if (token->type == WORD || token->type == ASSIGNMENT_WORD)
     {
-        s_cmd_node->type = AST_COMMAND;
+        s_cmd_node->type = AST_SIMPLE_COMMAND;
         bool switch_to_word = false;
         while (lexer_peek(lexer)->type == ASSIGNMENT_WORD
             || lexer_peek(lexer)->type == WORD)
@@ -29,9 +30,8 @@ bool parse_simple_command(struct lex *lexer, struct ast_node *s_cmd_node)
             struct ast_node word_child;
             ast_node_init(&word_child);
             word_child.type = AST_WORD;
-            //printf("%s\n", token->value);
-            word_child.data = token->value;
-            char *test = word_child.data;
+            word_child.data = malloc(sizeof(char) * strlen(token->value) + 1);
+            strcpy(word_child.data, token->value);
             insert_children(s_cmd_node, word_child);
             token_free(token);
         }
@@ -85,6 +85,7 @@ bool parse_rule_if(struct lex *lexer, struct ast_node *if_node)
 
 bool parse_command(struct lex *lexer, struct ast_node *cmd_node)
 {
+    cmd_node->type = AST_COMMAND;
     struct ast_node child_node;
     ast_node_init(&child_node);
     if (parse_simple_command(lexer, &child_node) || parse_rule_if(lexer, &child_node))
@@ -93,7 +94,10 @@ bool parse_command(struct lex *lexer, struct ast_node *cmd_node)
         return true;
     }
     else
+    {
+        ast_node_free_children(&child_node);
         return false;
+    }
 }
 
 bool parse_list(struct lex *lexer, struct ast_node *list_node)
@@ -101,7 +105,10 @@ bool parse_list(struct lex *lexer, struct ast_node *list_node)
     struct ast_node first_child_command;
     ast_node_init(&first_child_command);
     if (!(parse_command(lexer, &first_child_command)))
+    {
+        ast_node_free_children(&first_child_command);
         return false;
+    }
 
     list_node->type = AST_LIST;
     insert_children(list_node, first_child_command);
@@ -112,6 +119,8 @@ bool parse_list(struct lex *lexer, struct ast_node *list_node)
         ast_node_init(&child_command);
         if (parse_command(lexer, &child_command))
             insert_children(list_node, child_command);
+        else
+            ast_node_free_children(&child_command);
     }
     return true;
 }
