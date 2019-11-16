@@ -1,5 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Werror -Wextra -pedantic -std=c99 -g
+LDFLAGS= -lreadline
 VPATH=tests
 
 BIN=lexer
@@ -10,10 +11,10 @@ OBJS_DEBUG=lexer.o functional.o token.o token_rec.o
 
 all:$(BIN)
 $(BIN):$(OBJS)
-	$(CC) $^ -o $@ $(CFLAGS)
+	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS) -fsanitize=address
 
 $(BIN_DEBUG):$(OBJS_DEBUG)
-	$(CC) $^ -o $@ $(CFLAGS) -lcriterion
+	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS) -lcriterion
 	./check
 
 clean:

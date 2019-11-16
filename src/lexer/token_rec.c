@@ -273,20 +273,17 @@ static char *get_next_token(const char *str, size_t *ptr_i)
 
     while (!delimited || start == i)
     {
-        //1
-        if (str[i] == '\0')
+        if (!str)
         {
-            if (start == i)
-            {
-                //return eof
-                *ptr_i = i + 1;
-                return res;
-            }
-            else
-            {
-                //delimiter le token
-                delimited = 1;
-            }
+            //return eof
+            *ptr_i = i + 1;
+            return res;
+        }
+        //1
+        else if (str[i] == '\0' && start != i)
+        {
+            //delimiter le token
+            delimited = 1;
         }
         //2,3
         else if (start < i && is_operator(str, start, i))

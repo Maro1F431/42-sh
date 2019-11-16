@@ -9,18 +9,10 @@ int main(void)
 
     struct lex *l = lexer_alloc(str);
 
-    struct token *token = lexer_pop_command(l);
-    token_free(token);
-    token = lexer_pop_command(l);
-    token_free(token);
-    token = lexer_pop_command(l);
+    struct token *token = lexer_pop(l);
     token_free(token);
     token = lexer_pop(l);
     token_free(token);
-    token = lexer_pop(l);
-    token_free(token);
-
-    (void)token;
 
     lexer_free(l);
     return 0;
