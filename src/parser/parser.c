@@ -124,7 +124,7 @@ bool parse_list(struct lex *lexer, struct ast_node *list_node)
     return true;
 }
 
-bool parse_input(struct lex *lexer, struct ast_node *input_node)
+void parse_input(struct lex *lexer, struct ast_node *input_node)
 {
     input_node->type = AST_INPUT;
     struct ast_node list_node;
