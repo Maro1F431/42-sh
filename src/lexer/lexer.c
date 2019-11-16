@@ -59,9 +59,9 @@ static struct lex *add_token(struct lex *l, struct token *token)
 ** \param str the input string
 ** \param l the malloc'd lexer to build to
 */
-static struct token *lex(const char *str, size_t *ptr_i)
+static struct token *lex(const char *str, size_t *ptr_i, int mode)
 {
-    struct token *token = token_recognition(str, ptr_i);
+    struct token *token = token_recognition(str, ptr_i, mode);
 
     return token;
 }
@@ -98,7 +98,7 @@ void lexer_free(struct lex *lexer)
         token_free(lexer_pop(lexer));
     }
 
-    // maybe free input 
+    // maybe free input
 
     free(lexer);
 }
@@ -115,7 +115,7 @@ struct token *lexer_peek(struct lex *lexer)
         return NULL;
 
     size_t i = lexer->i;
-    struct token *next_token = lex(lexer->input, &i);
+    struct token *next_token = lex(lexer->input, &i, MODE_STD);
 
     return next_token;
 }
@@ -131,7 +131,7 @@ struct token *lexer_pop(struct lex *lexer)
     if (lexer->i > lexer->len)
         return NULL;
 
-    struct token *next_token = lex(lexer->input, &(lexer->i));
+    struct token *next_token = lex(lexer->input, &(lexer->i), MODE_STD);
 
     return next_token;
 }
@@ -141,7 +141,7 @@ struct token *lexer_pop_command(struct lex *lexer)
     if (lexer->i > lexer->len)
         return NULL;
 
-    struct token *next_token = lex(lexer->input, &(lexer->i));
+    struct token *next_token = lex(lexer->input, &(lexer->i), MODE_CMD);
     next_token->type = WORD;
 
     return next_token;

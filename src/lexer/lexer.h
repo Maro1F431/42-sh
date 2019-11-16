@@ -5,6 +5,12 @@
 
 #include "token.h"
 
+enum pop_mode
+{
+    MODE_STD = 0,
+    MODE_CMD
+};
+
 struct lex
 {
     size_t i;

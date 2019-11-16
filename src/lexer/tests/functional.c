@@ -90,6 +90,18 @@ Test(functional, multiple_words_word)
 }
 
 
+Test(functional, multiple_words_values)
+{
+    char str[] = "echo hello there";
+
+    struct lex *l = lexer_alloc(str);
+
+    cr_assert_str_eq(lexer_pop(l)->value, "echo");
+    cr_assert_str_eq(lexer_pop(l)->value, "hello");
+    cr_assert_str_eq(lexer_pop(l)->value ,"there");
+    cr_assert(lexer_pop(l)->type == END_OF_FILE);
+    cr_assert(lexer_pop(l) == NULL);
+}
 
 Test(functional, command_separated_by_operator)
 {
@@ -140,3 +152,15 @@ Test(functional, multiple_operators_with_no_space)
 }
 
 
+Test(functional, pop_command_multi)
+{
+    char str[] = "echo if;";
+
+    struct lex *l = lexer_alloc(str);
+
+    cr_assert(lexer_pop_command(l)->type == WORD);
+    cr_assert(lexer_pop_command(l)->type == WORD);
+    cr_assert(lexer_pop_command(l)->type == SEMICOL);
+    cr_assert(lexer_pop(l)->type == END_OF_FILE);
+    cr_assert(lexer_pop(l) == NULL);
+}

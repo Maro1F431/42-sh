@@ -10,7 +10,7 @@ OBJS_DEBUG=lexer.o functional.o helper.o token.o token_rec.o
 
 all:$(BIN)
 $(BIN):$(OBJS)
-	$(CC) $^ -o $@ $(CFLAGS) -fsanitize=address
+	$(CC) $^ -o $@ $(CFLAGS)
 
 $(BIN_DEBUG):$(OBJS_DEBUG)
 	$(CC) $^ -o $@ $(CFLAGS) -lcriterion

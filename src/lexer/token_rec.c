@@ -1,3 +1,4 @@
+#include "lexer.h"
 #include "token.h"
 #include "token_rec.h"
 
@@ -163,7 +164,7 @@ struct token_map g_token_map_list[NB_TOKENS] =
 ** \param str the input string
 ** \param ptr_i a pointer to the index where the word to identify starts
 */
-static struct token *match_type(char *word, struct token *token)
+static struct token *match_type(char *word, struct token *token, int mode)
 {
     if (word[0] == '\0')
     {
@@ -177,7 +178,14 @@ static struct token *match_type(char *word, struct token *token)
     {
         if (!strcmp(word, g_token_map_list[i].input))
         {
-            token->type = g_token_map_list[i].type;
+            int type = g_token_map_list[i].type;
+            if (mode == MODE_CMD && type >= WHILE && type <= FUNCTION)
+            {
+                token->type = WORD;
+                token->value = word;
+            }
+            else
+                token->type = g_token_map_list[i].type;
             break;
         }
         i++;
@@ -188,7 +196,8 @@ static struct token *match_type(char *word, struct token *token)
         token->type = WORD;
         token->value = word;
     }
-    else
+
+    if (token->type != WORD)
         free(word);
 
     return token;
@@ -342,12 +351,12 @@ static char *get_next_token(const char *str, size_t *ptr_i)
 /*
  * \ brief Returns next token
 */
-struct token *token_recognition(const char *str, size_t *ptr_i)
+struct token *token_recognition(const char *str, size_t *ptr_i, int mode)
 {
     char *next_token_word = get_next_token(str, ptr_i);
     struct token *new_token = init_token();
 
-    match_type(next_token_word, new_token);
+    match_type(next_token_word, new_token, mode);
 
     return new_token;
 }

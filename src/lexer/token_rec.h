@@ -10,6 +10,6 @@ struct token_map
     enum token_type type;
 };
 
-struct token *token_recognition(const char *str, size_t *ptr_i);
+struct token *token_recognition(const char *str, size_t *ptr_i, int mode);
 
 #endif
