@@ -270,6 +270,7 @@ static char *get_next_token(const char *str, size_t *ptr_i)
             if (start == i)
             {
                 //return eof
+                *ptr_i = i + 1;
                 return res;
             }
             else

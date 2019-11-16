@@ -13,7 +13,7 @@
 **
 ** \return the last token of the list
 ** \param l the lexer to get the last element from
-*/
+
 static struct token *get_tail(struct lex *l)
 {
     if (!l->head)
@@ -25,6 +25,7 @@ static struct token *get_tail(struct lex *l)
 
     return current_token;
 }
+*/
 
 /**
 ** \brief add token at the end of the linked list
@@ -32,7 +33,7 @@ static struct token *get_tail(struct lex *l)
 ** \return the updated lexer
 ** \param l the lexer to add the element to
 ** \param token the token to add to the lexer
-*/
+
 static struct lex *add_token(struct lex *l, struct token *token)
 {
     struct token *tail = get_tail(l);
@@ -49,7 +50,7 @@ static struct lex *add_token(struct lex *l, struct token *token)
 
     return l;
 }
-
+*/
 
 /**
 ** \brief build a lexer from the input string and a malloc'd lexer
@@ -58,19 +59,11 @@ static struct lex *add_token(struct lex *l, struct token *token)
 ** \param str the input string
 ** \param l the malloc'd lexer to build to
 */
-static struct lex *lex(const char *str, struct lex *l)
+static struct token *lex(const char *str, size_t *ptr_i)
 {
-    size_t i = 0;
-    int is_EOF = 0;
-    while (!is_EOF)
-    {
-        struct token *token = token_recognition(str, &i);
-        l = add_token(l, token);
+    struct token *token = token_recognition(str, ptr_i);
 
-        if (token->type == END_OF_FILE)
-            is_EOF = 1;
-    }
-    return l;
+    return token;
 }
 
 
@@ -87,9 +80,9 @@ struct lex *lexer_alloc(const char *str)
         return NULL;
 
     l->head = NULL;
-
-    if (!lex(str, l))
-        return NULL;
+    l->input = str;
+    l->len = strlen(str);
+    l->i = 0;
 
     return l;
 }
@@ -105,6 +98,8 @@ void lexer_free(struct lex *lexer)
         token_free(lexer_pop(lexer));
     }
 
+    // maybe free input 
+
     free(lexer);
 }
 
@@ -116,10 +111,13 @@ void lexer_free(struct lex *lexer)
 */
 struct token *lexer_peek(struct lex *lexer)
 {
-    if (!lexer || !lexer->head)
+   if (lexer->i > lexer->len)
         return NULL;
 
-    return lexer->head;
+    size_t i = lexer->i;
+    struct token *next_token = lex(lexer->input, &i);
+
+    return next_token;
 }
 
 /**
@@ -130,13 +128,22 @@ struct token *lexer_peek(struct lex *lexer)
 */
 struct token *lexer_pop(struct lex *lexer)
 {
-    if (!lexer || !lexer->head)
+    if (lexer->i > lexer->len)
         return NULL;
 
-    struct token *head = lexer->head;
-    lexer->head = lexer->head->next;
+    struct token *next_token = lex(lexer->input, &(lexer->i));
 
-    return head;
+    return next_token;
 }
 
+struct token *lexer_pop_command(struct lex *lexer)
+{
+    if (lexer->i > lexer->len)
+        return NULL;
 
+    struct token *next_token = lex(lexer->input, &(lexer->i));
+    next_token->type = WORD;
+
+    return next_token;
+
+}
