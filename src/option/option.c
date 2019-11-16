@@ -16,34 +16,36 @@ void init_option(struct option *opt)
 
 int parse_option(struct option *opt, int argc, char *argv[])
 {
-    // This function parse option
-    // set all needed flags at the right place
     int longg = 0;
-    int i = 0;
+    int i = 1;
     for (i = 1; i < argc; i++)
     {
         //printf("wghut");
         if (strcmp("--norc", argv[i]) ==  0 && longg == 0)
             opt->flag_norc = 1;
-        if (strcmp("--ast-print", argv[i]) == 0 && longg == 0)
+        else if (strcmp("--ast-print", argv[i]) == 0 && longg == 0)
             opt->flag_ast_print = 1;
-        if (strcmp("-c", argv[i]) == 0)
+        else if (strcmp("-c", argv[i]) == 0)
         {
             opt->flag_c = 1;
             longg = 1;
         }
-        if (strcmp("+o", argv[i]) == 0)
+        else if (strcmp("+o", argv[i]) == 0)
         {
             opt->flag_o_plus = 1;
             longg = 1;
         }
-        if (strcmp("-o", argv[i]) == 0)
+        else if (strcmp("-o", argv[i]) == 0)
         {
             opt->flag_o_minus = 1;
             longg = 1;
         }
         else
-            return i;
+        {
+            if (i == argc - 1)
+                return i;
+            return i + 1;
+        }
     }
-    return i;
+    return 1;
 }
