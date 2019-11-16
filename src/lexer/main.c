@@ -5,15 +5,22 @@
 
 int main(void)
 {
-    char str[] = "if << word {(&";
+    char str[] = "";
 
     struct lex *l = lexer_alloc(str);
 
-    printf("%s", lexer_pop(l)->value);
-    printf("%s", lexer_pop_command(l)->value);
-    printf("%s", lexer_pop_command(l)->value);
-    printf("%s", lexer_pop_command(l)->value);
-    printf("%s", lexer_pop_command(l)->value);
+    struct token *token = lexer_pop_command(l);
+    token_free(token);
+    token = lexer_pop_command(l);
+    token_free(token);
+    token = lexer_pop_command(l);
+    token_free(token);
+    token = lexer_pop(l);
+    token_free(token);
+    token = lexer_pop(l);
+    token_free(token);
+
+    (void)token;
 
     lexer_free(l);
     return 0;

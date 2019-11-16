@@ -5,8 +5,8 @@ VPATH=tests
 BIN=lexer
 BIN_DEBUG=check
 
-OBJS=helper.o main.o lexer.o token.o token_rec.o
-OBJS_DEBUG=lexer.o functional.o helper.o token.o token_rec.o
+OBJS= main.o lexer.o token.o token_rec.o
+OBJS_DEBUG=lexer.o functional.o token.o token_rec.o
 
 all:$(BIN)
 $(BIN):$(OBJS)

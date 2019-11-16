@@ -1,5 +1,4 @@
 #include "lexer.h"
-#include "helper.h"
 #include "token.h"
 #include "token_rec.h"
 
@@ -7,50 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
-/**
-** \brief get last element of list
-**
-** \return the last token of the list
-** \param l the lexer to get the last element from
-
-static struct token *get_tail(struct lex *l)
-{
-    if (!l->head)
-        return NULL;
-
-    struct token *current_token = l->head;
-    while (current_token->next)
-        current_token = current_token->next;
-
-    return current_token;
-}
-*/
-
-/**
-** \brief add token at the end of the linked list
-**
-** \return the updated lexer
-** \param l the lexer to add the element to
-** \param token the token to add to the lexer
-
-static struct lex *add_token(struct lex *l, struct token *token)
-{
-    struct token *tail = get_tail(l);
-
-    if (!tail)
-    {
-        l->head = token;
-        l->head->next = NULL;
-        return l;
-    }
-
-    tail->next = token;
-    tail->next->next = NULL;
-
-    return l;
-}
-*/
 
 /**
 ** \brief build a lexer from the input string and a malloc'd lexer
@@ -79,7 +34,6 @@ struct lex *lexer_alloc(const char *str)
     if (!l)
         return NULL;
 
-    l->head = NULL;
     l->input = str;
     l->len = strlen(str);
     l->i = 0;
@@ -142,7 +96,6 @@ struct token *lexer_pop_command(struct lex *lexer)
         return NULL;
 
     struct token *next_token = lex(lexer->input, &(lexer->i), MODE_CMD);
-    next_token->type = WORD;
 
     return next_token;
 
