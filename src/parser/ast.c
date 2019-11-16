@@ -13,7 +13,7 @@ void execute(struct ast_node *ast)
     {
         if (ast->type == AST_COMMAND)
         {
-            for (int i = 0; i < ast->nb_children; i++)
+            for (size_t i = 0; i < ast->nb_children; i++)
             {
                 if (ast->children[i].type == AST_SIMPLE_COMMAND)
                     execute_command(&ast->children[i]);

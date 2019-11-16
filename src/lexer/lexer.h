@@ -2,6 +2,7 @@
 # define LEXER_H
 
 #include <stddef.h>
+#include <stdio.h>
 
 #include "token.h"
 
@@ -11,12 +12,26 @@ enum pop_mode
     MODE_CMD
 };
 
+enum input_type
+{
+    INTERACTIVE,
+    SCRIPT,
+    STRING,
+    STANDARD
+};
+
 struct lex
 {
     size_t i;
     size_t len;
     char *input;
     int malloc_input;
+
+    enum input_type in_type;
+    FILE *fd;
+    size_t n;
+    char *line_ptr;
+
 };
 
 struct lex *lexer_alloc(char *str);

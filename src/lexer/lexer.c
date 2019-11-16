@@ -25,6 +25,48 @@ static struct token *lex(char *str, size_t *ptr_i, int mode)
 }
 
 
+void get_input(struct lex *l, enum input_type in_type)
+{
+    if (in_type == STRING)
+        l->input = NULL;
+    else if (in_type == SCRIPT)
+    {
+        int nb_char = getline(&l->line_ptr, &l->n, l->fd);
+        if (nb_char == -1)
+            l->input = NULL;
+        else
+        {
+            l->input = l->line_ptr;
+        }
+    }
+    else if (in_type == STANDARD)
+        l->input = NULL;
+    else // interactive
+    {
+        char *str = readline(">");
+        while (str && str[0] == '\0')
+        {
+            free(str);
+            str = readline(">");
+        }
+
+        add_history(str);
+
+        if (l->malloc_input)
+            free(l->input);
+        l->input = str;
+
+        if (str)
+            l->len = strlen(str);
+        l->i = 0;
+        l->malloc_input = 1;
+    }
+}
+
+
+
+
+
 /**
  ** \brief This is your struct lex forward declaration.
  **
@@ -41,6 +83,10 @@ struct lex *lexer_alloc(char *str)
     l->len = strlen(str);
     l->i = 0;
     l->malloc_input = 0;
+
+
+    l->line_ptr = NULL;
+
     return l;
 }
 /**
@@ -52,6 +98,7 @@ void lexer_free(struct lex *lexer)
 {
     if (lexer->malloc_input)
         free(lexer->input);
+
     free(lexer);
 }
 
@@ -86,7 +133,7 @@ void get_new_input(struct lex *lexer)
 struct token *lexer_peek(struct lex *lexer)
 {
     if (lexer->i > lexer->len || lexer->len == 0)
-        get_new_input(lexer);
+        get_input(lexer, lexer->in_type);
 
     size_t i = lexer->i;
     struct token *next_token = lex(lexer->input, &i, MODE_STD);
@@ -104,7 +151,7 @@ struct token *lexer_peek(struct lex *lexer)
 struct token *lexer_pop(struct lex *lexer)
 {
     if (lexer->i >= lexer->len || lexer->len == 0)
-        get_new_input(lexer);
+        get_input(lexer, lexer->in_type);
     struct token *next_token = lex(lexer->input, &(lexer->i), MODE_STD);
 
     return next_token;
@@ -113,7 +160,7 @@ struct token *lexer_pop(struct lex *lexer)
 struct token *lexer_pop_command(struct lex *lexer)
 {
     if (lexer->i >= lexer->len || lexer->len == 0)
-        get_new_input(lexer);
+        get_input(lexer, lexer->in_type);
 
     struct token *next_token = lex(lexer->input, &(lexer->i), MODE_CMD);
 
