@@ -15,15 +15,26 @@
 #define SIZE 100
 void interactive_mode(void)
 {
-    char *str = readline("42sh ");
-    if (str == NULL)
-        exit (1);
-    add_history(str);
-    struct lex *l = lexer_alloc(str);
-    struct ast_node ast;
-    ast_node_init(&ast);
-    parse_list(l, &ast);
-    execute(&ast);
+    int tty;
+    tty = isatty(STDIN_FILENO);
+    while (1)
+    {
+        char *str = readline(tty ? "42sh$ " : NULL);
+        if (str == NULL)
+        {
+            free(str);
+            exit (1);
+        }
+        add_history(str);
+        struct lex *l = lexer_alloc(str);
+        struct ast_node ast;
+        ast_node_init(&ast);
+        parse_list(l, &ast);
+        execute(&ast);
+        ast_node_free_children(&ast);
+        lexer_free(l);
+        free(str);
+    }
 }
 
 void parse_file(char *file)
@@ -75,6 +86,9 @@ int main(int argc, char *argv[])
             ast_node_init(&ast);
             parse_list(l, &ast);
             execute(&ast);
+            ast_node_free_children(&ast);
+            lexer_free(l);
+            free(str);
         }
         if (S_ISREG(finfo.st_mode))
         {
