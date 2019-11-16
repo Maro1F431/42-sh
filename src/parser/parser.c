@@ -11,22 +11,20 @@
 bool parse_simple_command(struct lex *lexer, struct ast_node *s_cmd_node)
 {
     struct token *token = lexer_peek(lexer);
-    if (!token)
-        return false;
 
     if (token->type == WORD || token->type == ASSIGNMENT_WORD)
     {
         s_cmd_node->type = AST_SIMPLE_COMMAND;
         bool switch_to_word = false;
-        while (lexer_peek(lexer)->type == ASSIGNMENT_WORD
-            || lexer_peek(lexer)->type == WORD)
+        while (lexer_peek_command(lexer)->type == ASSIGNMENT_WORD
+            || lexer_peek_command(lexer)->type == WORD)
         {
-            if (!switch_to_word && lexer_peek(lexer)->type == WORD)
+            if (!switch_to_word && lexer_peek_command(lexer)->type == WORD)
                 switch_to_word = true;
-            if (switch_to_word && lexer_peek(lexer)->type == ASSIGNMENT_WORD)
+            if (switch_to_word && lexer_peek_command(lexer)->type == ASSIGNMENT_WORD)
                     errx(1, "assignment_word after a word in command parsing");
                     //should exit the program
-            token = lexer_pop(lexer);
+            token = lexer_pop_command(lexer);
             struct ast_node word_child;
             ast_node_init(&word_child);
             word_child.type = AST_WORD;
@@ -43,6 +41,7 @@ bool parse_simple_command(struct lex *lexer, struct ast_node *s_cmd_node)
 
 bool parse_rule_if(struct lex *lexer, struct ast_node *if_node)
 {
+    //TODO USE COMPOUND_LIST_BREAK INSTEAD OF LIST
     //3 children, 1 condition, 1 body, 1 else body.
     //We are going to cheat for now and use list (as we have already done it),
     //instead of compound_list_break
@@ -112,7 +111,7 @@ bool parse_list(struct lex *lexer, struct ast_node *list_node)
 
     list_node->type = AST_LIST;
     insert_children(list_node, first_child_command);
-    while ((lexer_peek(lexer)->type) == SEMICOL)
+    while ((lexer_peek(lexer)->type) != END_OF_FILE && (lexer_peek(lexer)->type) != LINE_BREAK)//because command always parse up to a separator.
     {
         token_free(lexer_pop(lexer));
         struct ast_node child_command;
@@ -125,3 +124,11 @@ bool parse_list(struct lex *lexer, struct ast_node *list_node)
     return true;
 }
 
+bool parse_input(struct lex *lexer, struct ast_node *input_node)
+{
+    input_node->type = AST_INPUT;
+    struct ast_node list_node;
+    ast_node_init(&list_node);
+    if (parse_list(lexer, &list_node))
+        insert_children(input_node, list_node);
+}
