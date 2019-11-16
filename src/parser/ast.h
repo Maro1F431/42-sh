@@ -12,7 +12,8 @@ enum ast_type
     AST_PIPE,
     AST_LIST,
     AST_IF,
-    AST_WORD
+    AST_WORD,
+    AST_INPUT
 };
 
 struct ast_node
