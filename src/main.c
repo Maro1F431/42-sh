@@ -42,7 +42,13 @@ void interactive_mode(void) // interactive and pipe
         }
         else // pipe
         {
-            str = readline(NULL);
+            size_t i = 0;
+            ssize_t nb_read = getline(&str, &i, stdin);
+            if (nb_read == -1)
+            {
+                free(str);
+                break;
+            }
             l = lexer_alloc(str);
             l->in_type = STANDARD;
         }
@@ -50,7 +56,6 @@ void interactive_mode(void) // interactive and pipe
 
         if (str == NULL)
         {
-            free(str);
             exit (1);
         }
         add_history(str);
@@ -148,7 +153,7 @@ int main(int argc, char *argv[])
             lexer_free(l);
             free(str);
         }
-        if (S_ISREG(finfo.st_mode))
+        if (index_files != -1 && S_ISREG(finfo.st_mode))
         {
             parse_file(argv[k]);
         }
