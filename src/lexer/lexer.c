@@ -68,9 +68,6 @@ void get_input(struct lex *l, enum input_type in_type)
 }
 
 
-
-
-
 /**
  ** \brief This is your struct lex forward declaration.
  **
@@ -106,26 +103,11 @@ void lexer_free(struct lex *lexer)
     free(lexer);
 }
 
-void get_new_input(struct lex *lexer)
+struct token *eof_token(void)
 {
-    char *str = readline(">");
-    while (str && str[0] == '\0')
-    {
-        free(str);
-        str = readline(">");
-    }
-
-
-    //check signal
-    //add history
-    if (lexer->malloc_input)
-        free(lexer->input);
-    lexer->input = str;
-
-    if (str)
-        lexer->len = strlen(str);
-    lexer->i = 0;
-    lexer->malloc_input = 1;
+    struct token *token = init_token();
+    token->type = END_OF_FILE;
+    return token;
 }
 
 /**
@@ -164,8 +146,9 @@ struct token *lexer_pop(struct lex *lexer)
 struct token *lexer_pop_command(struct lex *lexer)
 {
     if (lexer->i >= lexer->len || lexer->len == 0)
+    {
         get_input(lexer, lexer->in_type);
-
+    }
     struct token *next_token = lex(lexer->input, &(lexer->i), MODE_CMD);
 
     return next_token;
@@ -181,7 +164,5 @@ struct token *lexer_peek_command(struct lex *lexer)
     size_t i = lexer->i;
     struct token *next_token = lex(lexer->input, &i, MODE_CMD);
 
-
     return next_token;
-
 }
