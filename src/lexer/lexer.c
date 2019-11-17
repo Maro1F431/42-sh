@@ -39,6 +39,8 @@ void get_input(struct lex *l, enum input_type in_type)
         else
         {
             l->input = l->line_ptr;
+            l->i = 0;
+            l->len = nb_char;
         }
     }
     else if (in_type == STANDARD)
