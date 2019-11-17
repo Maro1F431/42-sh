@@ -32,6 +32,7 @@ struct lex
     size_t n;
     char *line_ptr;
 
+    struct token *last_token;
 };
 
 struct lex *lexer_alloc(char *str);

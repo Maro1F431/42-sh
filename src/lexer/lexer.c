@@ -85,7 +85,7 @@ struct lex *lexer_alloc(char *str)
     l->i = 0;
     l->malloc_input = 0;
 
-
+    l->last_token = NULL;
     l->line_ptr = NULL;
 
     return l;
@@ -99,7 +99,8 @@ void lexer_free(struct lex *lexer)
 {
     if (lexer->malloc_input)
         free(lexer->input);
-
+    if (lexer->last_token)
+        token_free(lexer->last_token);
     free(lexer);
 }
 
@@ -123,6 +124,12 @@ struct token *lexer_peek(struct lex *lexer)
 
     size_t i = lexer->i;
     struct token *next_token = lex(lexer->input, &i, MODE_STD);
+
+    if (lexer->last_token)
+    {
+        token_free(lexer->last_token);
+    }
+    lexer->last_token = next_token;
 
     return next_token;
 }
@@ -161,8 +168,14 @@ struct token *lexer_peek_command(struct lex *lexer)
     if (lexer->i >= lexer->len || lexer->len == 0)
         get_input(lexer, lexer->in_type);
 
+
     size_t i = lexer->i;
     struct token *next_token = lex(lexer->input, &i, MODE_CMD);
+    if (lexer->last_token)
+    {
+        token_free(lexer->last_token);
+    }
+    lexer->last_token = next_token;
 
     return next_token;
 }
