@@ -56,7 +56,7 @@ bool parse_rule_if(struct lex *lexer, struct ast_node *if_node)
         parse_list(lexer, &condition_list_node);
         insert_children(if_node, condition_list_node);
 
-        if (lexer_peek(lexer)->type == THEN)
+        if (lexer_peek(lexer)->type == THEN && !double_check_tty(lexer, THEN))
         {
             token_free(lexer_pop(lexer));
             struct ast_node ifbody_list_node;
@@ -72,6 +72,11 @@ bool parse_rule_if(struct lex *lexer, struct ast_node *if_node)
                 parse_list(lexer, &elsebody_list_node);
                 insert_children(if_node, elsebody_list_node);
             }
+
+            if (lexer_peek(lexer)->type != FI && !double_check_tty(lexer, IF))
+                errx(1, "expected fi after if clause");
+            else
+                token_free(lexer_pop(lexer));
             return true;
         }
         else
@@ -119,7 +124,10 @@ bool parse_list(struct lex *lexer, struct ast_node *list_node)
         if (parse_command(lexer, &child_command))
             insert_children(list_node, child_command);
         else
+        {
             ast_node_free_children(&child_command);
+            break;
+        }
     }
     return true;
 }
@@ -131,4 +139,18 @@ void parse_input(struct lex *lexer, struct ast_node *input_node)
     ast_node_init(&list_node);
     if (parse_list(lexer, &list_node))
         insert_children(input_node, list_node);
+}
+
+bool double_check_tty(struct lex *lexer, unsigned token_type)
+{
+    if (lexer_peek(lexer)->type == END_OF_FILE)
+    {
+        token_free(lexer_pop(lexer));
+        if (lexer_peek(lexer)->type == token_type)
+            return true;
+        else
+            return false; 
+    }
+    else
+        return false;
 }
