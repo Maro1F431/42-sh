@@ -148,6 +148,7 @@ int main(int argc, char *argv[])
             struct ast_node ast;
             ast_node_init(&ast);
             parse_list(l, &ast);
+            print_ast(&ast);
             execute(&ast);
             ast_node_free_children(&ast);
             lexer_free(l);

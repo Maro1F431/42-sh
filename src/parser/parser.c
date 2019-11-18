@@ -53,7 +53,7 @@ bool parse_rule_if(struct lex *lexer, struct ast_node *if_node)
         if_node->type = AST_IF;
         struct ast_node condition_list_node;
         ast_node_init(&condition_list_node);
-        parse_list(lexer, &condition_list_node);
+        parse_compound_list_break(lexer, &condition_list_node);
         insert_children(if_node, condition_list_node);
 
         if (lexer_peek(lexer)->type == THEN && !double_check_tty(lexer, THEN))
@@ -61,15 +61,34 @@ bool parse_rule_if(struct lex *lexer, struct ast_node *if_node)
             token_free(lexer_pop(lexer));
             struct ast_node ifbody_list_node;
             ast_node_init(&ifbody_list_node);
-            parse_list(lexer, &ifbody_list_node);
+            parse_compound_list_break(lexer, &ifbody_list_node);
             insert_children(if_node, ifbody_list_node);
 
+            while(lexer_peek(lexer)->type == ELIF)
+            {
+                token_free(lexer_pop(lexer));
+                struct ast_node elifcond_list_node;
+                ast_node_init(&elifcond_list_node);
+                parse_compound_list_break(lexer, &elifcond_list_node);
+                insert_children(if_node, elifcond_list_node);
+
+                if (lexer_peek(lexer)->type == THEN && !double_check_tty(lexer, THEN))
+                {
+                    token_free(lexer_pop(lexer));
+                    struct ast_node elifbody_list_node;
+                    ast_node_init(&elifbody_list_node);
+                    parse_compound_list_break(lexer, &elifbody_list_node);
+                    insert_children(if_node, elifbody_list_node);
+                }
+                else
+                    return false;
+            }
             if (lexer_peek(lexer)->type == ELSE)
             {
                 token_free(lexer_pop(lexer));
                 struct ast_node elsebody_list_node;
                 ast_node_init(&elsebody_list_node);
-                parse_list(lexer, &elsebody_list_node);
+                parse_compound_list_break(lexer, &elsebody_list_node);
                 insert_children(if_node, elsebody_list_node);
             }
 
@@ -102,6 +121,57 @@ bool parse_command(struct lex *lexer, struct ast_node *cmd_node)
         ast_node_free_children(&child_node);
         return false;
     }
+}
+
+bool parse_compound_list(struct lex *lexer, struct ast_node *cl_node)
+{
+    cl_node->type = AST_COMPOUND_LIST;
+    skip_line_break(lexer);
+    struct ast_node child_node;
+    ast_node_init(&child_node);
+    if (!parse_command(lexer, &child_node))
+        return false;
+    insert_children(cl_node, child_node);
+    while (lexer_peek(lexer)->type == SEMICOL || lexer_peek(lexer)->type == LINE_BREAK)
+    {
+        token_free(lexer_pop(lexer));
+        skip_line_break(lexer);
+        struct ast_node child_node;
+        ast_node_init(&child_node);
+        if(parse_command(lexer, &child_node))
+            insert_children(cl_node, child_node);
+        else
+        {
+            ast_node_free_children(&child_node);
+            break;
+        }
+    }
+    return true;
+}
+
+bool parse_compound_list_break(struct lex *lexer, struct ast_node *clb_node)
+{
+    clb_node->type = AST_COMPOUND_LIST_BREAK;
+    struct ast_node child_node;
+    ast_node_init(&child_node);
+    skip_line_break(lexer);
+    while (parse_command(lexer, &child_node))
+    {
+        insert_children(clb_node, child_node);
+        ast_node_init(&child_node);
+        if (lexer_peek(lexer)->type != SEMICOL && lexer_peek(lexer)->type != LINE_BREAK)
+            return false;
+        else
+            token_free(lexer_pop(lexer));
+        skip_line_break(lexer);
+    }
+    ast_node_free_children(&child_node);
+    if (clb_node->nb_children == 0)
+    {
+        return false;
+    }
+    else
+        return true;
 }
 
 bool parse_list(struct lex *lexer, struct ast_node *list_node)
@@ -153,4 +223,12 @@ bool double_check_tty(struct lex *lexer, unsigned token_type)
     }
     else
         return false;
+}
+
+void skip_line_break(struct lex *lexer)
+{
+    while (lexer_peek(lexer)->type == LINE_BREAK)
+    {
+        token_free(lexer_pop(lexer));
+    }
 }

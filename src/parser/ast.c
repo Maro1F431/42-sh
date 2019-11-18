@@ -132,6 +132,12 @@ void print_type(int i)
         printf("IF\n");
     else if (i == 7)
         printf("WORD: ");
+    else if (i == 8)
+        printf("INPUT\n");
+    else if (i == 9)
+        printf("COMPOUND_LIST_BREAK\n");
+    else if (i == 10)
+        printf("COMPOUND_LIST\n");
 }
 
 
