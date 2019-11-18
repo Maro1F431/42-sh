@@ -64,6 +64,25 @@ bool parse_rule_if(struct lex *lexer, struct ast_node *if_node)
             parse_compound_list_break(lexer, &ifbody_list_node);
             insert_children(if_node, ifbody_list_node);
 
+            while(lexer_peek(lexer)->type == ELIF)
+            {
+                token_free(lexer_pop(lexer));
+                struct ast_node elifcond_list_node;
+                ast_node_init(&elifcond_list_node);
+                parse_compound_list_break(lexer, &elifcond_list_node);
+                insert_children(if_node, elifcond_list_node);
+
+                if (lexer_peek(lexer)->type == THEN && !double_check_tty(lexer, THEN))
+                {
+                    token_free(lexer_pop(lexer));
+                    struct ast_node elifbody_list_node;
+                    ast_node_init(&elifbody_list_node);
+                    parse_compound_list_break(lexer, &elifbody_list_node);
+                    insert_children(if_node, elifbody_list_node);
+                }
+                else
+                    return false;
+            }
             if (lexer_peek(lexer)->type == ELSE)
             {
                 token_free(lexer_pop(lexer));
@@ -104,15 +123,15 @@ bool parse_command(struct lex *lexer, struct ast_node *cmd_node)
     }
 }
 
-bool parse_compound_list(struct lex *lexer, struct ast_node *clb_node)
+bool parse_compound_list(struct lex *lexer, struct ast_node *cl_node)
 {
-    clb_node->type = AST_COMPOUND_LIST;
+    cl_node->type = AST_COMPOUND_LIST;
     skip_line_break(lexer);
     struct ast_node child_node;
     ast_node_init(&child_node);
     if (!parse_command(lexer, &child_node))
         return false;
-    insert_children(clb_node, child_node);
+    insert_children(cl_node, child_node);
     while (lexer_peek(lexer)->type == SEMICOL || lexer_peek(lexer)->type == LINE_BREAK)
     {
         token_free(lexer_pop(lexer));
@@ -120,7 +139,7 @@ bool parse_compound_list(struct lex *lexer, struct ast_node *clb_node)
         struct ast_node child_node;
         ast_node_init(&child_node);
         if(parse_command(lexer, &child_node))
-            insert_children(clb_node, child_node);
+            insert_children(cl_node, child_node);
         else
         {
             ast_node_free_children(&child_node);
