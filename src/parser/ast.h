@@ -14,7 +14,8 @@ enum ast_type
     AST_IF,
     AST_WORD,
     AST_INPUT,
-    AST_COMPOUND_LIST_BREAK
+    AST_COMPOUND_LIST_BREAK,
+    AST_COMPOUND_LIST
 };
 
 struct ast_node

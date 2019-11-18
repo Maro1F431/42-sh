@@ -135,6 +135,8 @@ void print_type(int i)
     else if (i == 8)
         printf("INPUT\n");
     else if (i == 9)
+        printf("COMPOUND_LIST_BREAK\n");
+    else if (i == 10)
         printf("COMPOUND_LIST\n");
 }
 

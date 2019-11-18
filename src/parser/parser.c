@@ -104,9 +104,9 @@ bool parse_command(struct lex *lexer, struct ast_node *cmd_node)
     }
 }
 
-bool parse_compound_list_break(struct lex *lexer, struct ast_node *clb_node)
+bool parse_compound_list(struct lex *lexer, struct ast_node *clb_node)
 {
-    clb_node->type = AST_COMPOUND_LIST_BREAK;
+    clb_node->type = AST_COMPOUND_LIST;
     skip_line_break(lexer);
     struct ast_node child_node;
     ast_node_init(&child_node);
@@ -128,6 +128,31 @@ bool parse_compound_list_break(struct lex *lexer, struct ast_node *clb_node)
         }
     }
     return true;
+}
+
+bool parse_compound_list_break(struct lex *lexer, struct ast_node *clb_node)
+{
+    clb_node->type = AST_COMPOUND_LIST_BREAK;
+    struct ast_node child_node;
+    ast_node_init(&child_node);
+    skip_line_break(lexer);
+    while (parse_command(lexer, &child_node))
+    {
+        insert_children(clb_node, child_node);
+        ast_node_init(&child_node);
+        if (lexer_peek(lexer)->type != SEMICOL && lexer_peek(lexer)->type != LINE_BREAK)
+            return false;
+        else
+            token_free(lexer_pop(lexer));
+        skip_line_break(lexer);
+    }
+    ast_node_free_children(&child_node);
+    if (clb_node->nb_children == 0)
+    {
+        return false;
+    }
+    else
+        return true;
 }
 
 bool parse_list(struct lex *lexer, struct ast_node *list_node)
